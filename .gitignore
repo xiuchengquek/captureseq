@@ -1,0 +1,7 @@
+env
+node_modules
+supervisor.log
+gunicorn.log
+.idea
+access.log
+error.log
