@@ -26,6 +26,7 @@
     "grunt-contrib-uglify": "~0.5.0",
     "grunt-contrib-watch" : "*",
     "grunt-contrib-cssmin" : "*",
-    "dalliance" : "git://github.com/dasmoth/dalliance.git"
+    "dalliance" : "git://github.com/dasmoth/dalliance.git",
+    "grunt-contrib-copy" : "*"
   }
 }

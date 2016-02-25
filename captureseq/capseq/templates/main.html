@@ -1,29 +1,31 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="capseq">
 <head>
+    {% load staticfiles %}
     <meta charset="UTF-8">
     <title>Capture Seq</title>
-    {% load staticfiles %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="{% static 'css/built.css' %}">
     <script src="{% static 'js/dependencies.js' %}"></script>
-    <script src="{% static 'js/dalliance-all.js' %}"></script>
-
+    <script type="text/javascript" src="http://www.biodalliance.org/release-0.13/dalliance-compiled.js"></script>
 </head>
 <body>
+<nav class="navbar navbar-default navbar-static-top">
+  <div class="container">
+    <a class="navbar-brand" href="#">CaptureSeq</a>
 
-    <div ng-controller="GenomeController">
+  </div>
+</nav>
+    <div class="row">
+        <div class="col-md-1"></div>
 
-
-        <genome-browser>
-            <div id="svgHolder"></div>
-git a
-        </genome-browser>
+        <div class="col-md-10" ng-controller="GenomeController">
+                <div id="svgHolder"></div>
+        </div>
+        <div class="col-md-1"></div>
 
     </div>
-
-
-
-
-
     <script src="{% static 'js/built/capseq.built.js' %}"></script>
 </body>
 </html>

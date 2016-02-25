@@ -13,10 +13,9 @@
   "html5-boilerplate": "~5.2.0",
   "lodash": "4.5.0",
   "bootstrap": "3.3.4",
-  "dalliance" :
-
-
-
+  "dalliance" : "https://pwbc.garvan.org.au/~xiuque/capseq_data/dalliance-compiled.js",
+  "components-font-awesome" : "*",
+  "jquery": ">= 1.9.1"
 }
 
 }

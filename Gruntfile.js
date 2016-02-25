@@ -12,12 +12,16 @@ module.exports = function(grunt) {
                 separator: ';\n',
             },
             libraries : {
-                    src: ['public/lib/angular/angular.js',
+                    src: ['public/lib/jquery/dist/jquery.min.js',
+                    'public/lib/boostrap/dist/js/boostrap.min.js',
+                    'public/lib/angular/angular.js',
                     'public/lib/angular-loader/angular-loader.js',
                     'public/lib/angular-route/angular-route.js',
                     'public/lib/angular-mocks/angular-mocks.js',
-                    'public/lib/cytoscape/dist/cytoscape.js',
                     'public/lib/lodash/dist/lodash.js',
+
+
+
                      ],
                 dest: 'captureseq/static/js/dependencies.js'
 
@@ -37,9 +41,12 @@ module.exports = function(grunt) {
             options: {},
             target : {
                 files: {
-                    'static/css/built.css': [
+                    'captureseq/static/css/built.css': [
                         'public/lib/html5-boilerplate/dist/css/main.css',
                         'public/lib/html5-boilerplate/dist/css/normalize.css',
+                        'public/lib/html5-boilerplate/dist/css/normalize.css',
+                        'public/lib/bootstrap/dist/css/bootstrap.min.css',
+                        'public/lib/dalliance/*.css',
                         'captureseq/capseq/static/css/app.css']
                 }
             }
@@ -55,7 +62,23 @@ module.exports = function(grunt) {
                 }
             }
 
+        },
+
+
+        copy: {
+
+            main : {
+
+                files : [
+                    {expand: true ,  cwd: 'public/lib/', src : ['components-font-awesome/**'], dest : 'captureseq/static/'}
+
+                ]
+
+            }
+
+
         }
+
 
 
         });
@@ -66,8 +89,9 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
+    grunt.loadNpmTasks('grunt-contrib-copy');
 
     // Default task(s).
-    grunt.registerTask('default', ['concat','cssmin','watch']);
+    grunt.registerTask('default', ['concat','cssmin','watch','copy']);
 
 };

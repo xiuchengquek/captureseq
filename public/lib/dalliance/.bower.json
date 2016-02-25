@@ -1,0 +1,14 @@
+{
+  "name": "dalliance",
+  "_cacheHeaders": {
+    "ETag": "\"3fab0020-40779-52bfce4a00ac0\"",
+    "Last-Modified": "Wed, 17 Feb 2016 20:14:11 GMT",
+    "Content-Length": "264057",
+    "Content-Type": "text/javascript"
+  },
+  "_release": "e-tag:3fab0020-",
+  "main": "index.js",
+  "_source": "https://pwbc.garvan.org.au/~xiuque/capseq_data/dalliance-compiled.js",
+  "_target": "*",
+  "_originalSource": "https://pwbc.garvan.org.au/~xiuque/capseq_data/dalliance-compiled.js"
+}
