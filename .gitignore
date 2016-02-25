@@ -5,3 +5,4 @@ gunicorn.log
 .idea
 access.log
 error.log
+*.pyc
