@@ -1,11 +1,6 @@
 /**
  * Created by xiuchengquek on 25/02/2016.
  */
-/**
- * Created by xiuchengquek on 21/02/2016.
- */
-
-
 
 module.exports = function(grunt) {
 
@@ -29,11 +24,13 @@ module.exports = function(grunt) {
             },
             user_code : {
 
-                    src: ['captureseq/capseq/static/js/*.js'],
+                    src: ['captureseq/capseq/static/js/*.js','captureseq/capseq/static/js/genomeView/*.js' ],
                     dest: 'captureseq/capseq/static/js/built/capseq.built.js'
+            },
+             user_code_local : {
 
-
-
+                    src: ['captureseq/capseq/static/js/*.js','captureseq/capseq/static/js/genomeView/*.js' ],
+                    dest: 'captureseq/static_local/js/built/capseq.built.js'
             },
         },
         cssmin: {
@@ -43,7 +40,7 @@ module.exports = function(grunt) {
                     'static/css/built.css': [
                         'public/lib/html5-boilerplate/dist/css/main.css',
                         'public/lib/html5-boilerplate/dist/css/normalize.css',
-                        'app/app.css']
+                        'captureseq/capseq/static/css/app.css']
                 }
             }
 
@@ -51,8 +48,7 @@ module.exports = function(grunt) {
 
         watch: {
             scripts:{
-
-                files: ['app/mainView/mainView.js', ' app/view2/app.js'],
+                files: ['captureseq/capseq/static/js/*.js','captureseq/capseq/static/js/genomeView/*.js'] ,
                 tasks : ['concat'],
                 option : {
                     spawn : false,

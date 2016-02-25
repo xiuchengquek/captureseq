@@ -1,13 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" ng-app="capseq">
 <head>
     <meta charset="UTF-8">
     <title>Capture Seq</title>
+    {% load staticfiles %}
+    <script src="{% static 'js/dependencies.js' %}"></script>
+    <script src="{% static 'js/dalliance-all.js' %}"></script>
+
 </head>
 <body>
 
+    <div ng-controller="GenomeController">
+
+
+        <genome-browser>
+            <div id="svgHolder"></div>
+git a
+        </genome-browser>
+
+    </div>
 
 
 
+
+
+    <script src="{% static 'js/built/capseq.built.js' %}"></script>
 </body>
 </html>
