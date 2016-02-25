@@ -55,9 +55,9 @@ angular.module('capseq')
 
 
     new Browser({
-    chr:          '22',
-    viewStart:    30000000,
-    viewEnd:      30030000,
+    chr:          '10',
+    viewStart:    115779011,
+    viewEnd:      115783011,
     cookieKey:    'human',
 
     coordSystem: {
