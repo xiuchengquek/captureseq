@@ -15,7 +15,8 @@
   "bootstrap": "3.3.4",
   "dalliance" : "https://pwbc.garvan.org.au/~xiuque/capseq_data/dalliance-compiled.js",
   "components-font-awesome" : "*",
-  "jquery": ">= 1.9.1"
+  "jquery": ">= 1.9.1",
+  "d3" : "3.5.16"
 }
 
 }

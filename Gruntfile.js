@@ -19,6 +19,7 @@ module.exports = function(grunt) {
                     'public/lib/angular-route/angular-route.js',
                     'public/lib/angular-mocks/angular-mocks.js',
                     'public/lib/lodash/dist/lodash.js',
+                    'public/lib/d3/d3.min.js'
 
 
 

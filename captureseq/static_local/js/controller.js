@@ -4,31 +4,43 @@
 angular.module('capseq')
   .controller('GenomeController' , ['$scope', function($scope){
 
-
-
-      $scope.sources = [
-          {
-
-
-
-
-
-          }
-
-
-
-
-
-      ];
-
     var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/'
       console.log('test')
 
+      function gencodeFIP(feature, info) {
+    'use strict';
+    var isGene = false;
+    for (var hi = 0; hi < info.hit.length; ++hi) {
+      if (info.hit[hi].isSuperGroup){
+        isGene = true;
+      }
+    }
+
+    if (!isGene) {
+      info.setTitle('Transcript: ' + feature.label);
+      info.add('Transcript ID', feature.label);
+      info.add('Transcript biotype', feature.method);
+
+    } else {
+      info.setTitle('Gene: ' + feature.geneId);
+    }
+
+    info.add('Gene ID', feature.geneId);
+    info.add('Gene name', feature.geneName);
+    info.add('Gene biotype', feature.geneBioType);
+
+    if (!isGene) {
+      info.add('Transcript attributes', feature.tags);
+    }
+
+  }
+
+
 
     new Browser({
-    chr:          '22',
-    viewStart:    30000000,
-    viewEnd:      30030000,
+    chr:          '10',
+    viewStart:    115779011,
+    viewEnd:      115783011,
     cookieKey:    'human',
 
     coordSystem: {
@@ -52,8 +64,9 @@ angular.module('capseq')
                    {   name: 'GENCODE version 19',
                        bwgURI: file_server + 'gencode.v19.annotation.bb',
                        collapseSuperGroups: true,
-                                              trixURI: file_server + 'gencode.v19.annotation.ix',
+                       trixURI: file_server + 'gencode.v19.annotation.ix',
                        noSourceFeatureInfo: true,
+                       featureInfoPlugin: gencodeFIP
 
 
                        },
@@ -64,11 +77,32 @@ angular.module('capseq')
                     {
                         name : 'Capture Region - Melanoma',
                         bwgURI : file_server + 'captured_region_melanoma.bb'
-                    }
+                    },
 
+                    {
+                        name : 'Capture Transcripts - Body Atlas',
+                        bwgURI : file_server + 'capture_transcript_tissue_dirty_noas.bb',
+                                               collapseSuperGroups: true,
+                                               noSourceFeatureInfo: true,
+                        featureInfoPlugin:   function(f, info) {
+                            console.log(f['field15'])
+                            console.log(info)
+                          info.add('Testing', 'This is a test');
+                      },
 
-]
+                    },
+         {
+                        name : 'Capture Transcripts - Melanoma',
+                        bwgURI : file_server + 'capture_transcript_melanoma_dirty_noas.bb',
+                                               collapseSuperGroups: true,
+                                               noSourceFeatureInfo: true,
+                        featureInfoPlugin:   function(f, info) {
+                            console.log(f['field15'])
+                            console.log(info)
+                          info.add('Testing', 'This is a test');
+                      }}]
   });
+
 
 
 

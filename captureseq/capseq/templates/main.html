@@ -9,23 +9,36 @@
     <link rel="stylesheet" href="{% static 'css/built.css' %}">
     <script src="{% static 'js/dependencies.js' %}"></script>
     <script type="text/javascript" src="http://www.biodalliance.org/release-0.13/dalliance-compiled.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
 </head>
-<body>
+<body  ng-controller="GenomeController">
 <nav class="navbar navbar-default navbar-static-top">
   <div class="container">
     <a class="navbar-brand" href="#">CaptureSeq</a>
 
   </div>
 </nav>
-    <div class="row">
+    <div class="row" >
         <div class="col-md-1"></div>
-
-        <div class="col-md-10" ng-controller="GenomeController">
+        <div class="col-md-10">
                 <div id="svgHolder"></div>
         </div>
         <div class="col-md-1"></div>
-
     </div>
+    <div class="row">
+        <div class="col-md-1"></div>
+            <div class="col-md-5" >
+                <bar-chart id="expression" data="expression" transcript_id = 'transcript_id'></bar-chart>
+            </div>
+            <div class="col-md-5">
+                <div id="transcript_info">
+                    [[ expression.transcript_name]]
+                </div>
+            </div>
+        <div class="col-md-1"></div>
+    </div>
+
     <script src="{% static 'js/built/capseq.built.js' %}"></script>
 </body>
 </html>
