@@ -19,8 +19,8 @@ angular.module('capseq')
 
 
         var margin = {top: 20, right: 20, bottom: 50, left: 40},
-            width = 400 - margin.left - margin.right,
-            height = 400 - margin.top - margin.bottom;
+            width = 600 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
 
         var x = d3.scale.ordinal()
             .rangeRoundBands([0, width], .1);
@@ -32,8 +32,7 @@ angular.module('capseq')
             .scale(x)
             .orient("bottom");
 
-        var yAxis = d3.svg.axis()
-            .scale(y)
+        var yAxis = d3.svg.axis().scale(y)
             .orient("left");
 
         var svg = d3.select("#expression").append("svg")
@@ -42,24 +41,18 @@ angular.module('capseq')
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        function plotBar(data){
+            svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+          .selectAll("text")
+            .attr("y", 0)
+            .attr("x", 9)
+            .attr("dy", ".35em")
+            .attr("transform", "rotate(90)")
+            .style("text-anchor", "start");;
 
-          var value = data.details;
-          x.domain(value.map(function(d) { return d.label; }));
-          y.domain([0, d3.max(value, function(d) { return d.value; })]);
-
-          svg.append("g")
-              .attr("class", "x axis")
-              .attr("transform", "translate(0," + height + ")")
-              .call(xAxis)
-            .selectAll("text")
-              .attr("y", 0)
-              .attr("x", 9)
-              .attr("dy", ".35em")
-              .attr("transform", "rotate(90)")
-              .style("text-anchor", "start");;
-
-          svg.append("g")
+              svg.append("g")
               .attr("class", "y axis")
               .call(yAxis)
             .append("text")
@@ -68,16 +61,44 @@ angular.module('capseq')
               .attr("dy", ".71em")
               .style("text-anchor", "end")
               .text("Expression (FPKM)");
+        console.log(scope.data)
 
-          svg.selectAll(".bar")
-              .data(value)
-            .enter().append("rect")
-              .attr("class", "bar")
-              .attr("x", function(d) { return x(d.label); })
-              .attr("width", x.rangeBand())
-              .attr("y", function(d) { return y(d.value); })
-              .attr("height", function(d) { return height - y(d.value); });
-          }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        function plotBar(data) {
+          console.log(data)
+
+          x.domain(data.map(function(d) { return d.label; }));
+          y.domain([0, d3.max(data, function(d) { return Number(d.value); })]);
+
+          svg.selectAll(".bar").remove()
+
+         svg.selectAll(".bar")
+             .data(data)
+             .enter().append("rect")
+             .attr("class", "bar")
+             .attr("x", function(d) { return x(d.label); })
+             .attr("width", x.rangeBand())
+             .attr("y", function(d) { console.log('test') ; return y(d.value); })
+             .attr("height", function(d) { return height - y(d.value); });
+
+
+        }
+
+
+
+
 
 
 

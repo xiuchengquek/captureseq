@@ -11,6 +11,38 @@
     <script type="text/javascript" src="http://www.biodalliance.org/release-0.13/dalliance-compiled.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
+
+    <style>
+
+
+
+.bar {
+  fill: steelblue;
+}
+
+.bar:hover {
+  fill: brown;
+}
+
+.axis {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+
+
+    </style>
+
 </head>
 <body  ng-controller="GenomeController">
 <nav class="navbar navbar-default navbar-static-top">
@@ -29,7 +61,7 @@
     <div class="row">
         <div class="col-md-1"></div>
             <div class="col-md-5" >
-                <bar-chart id="expression" data="expression" transcript_id = 'transcript_id'></bar-chart>
+                <bar-chart id="expression" data="expression.expression" transcript_id = 'transcript_id'></bar-chart>
             </div>
             <div class="col-md-5">
                 <div id="transcript_info">
