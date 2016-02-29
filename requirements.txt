@@ -3,4 +3,3 @@ djangorestframework
 markdown       # Markdown support for the browsable API.
 django-filter  # Filtering support
 jsonfield==1.0.3
-git a
