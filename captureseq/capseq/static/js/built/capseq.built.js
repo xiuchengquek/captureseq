@@ -110,7 +110,7 @@ angular.module('capseq')
 
                 {
                     name: 'Capture Transcripts - Body Atlas',
-                    bwgURI: file_server + 'capture_transcript_tissue_dirty_noas.bb',
+                    bwgURI: file_server + 'capture_transcript_tissue.bb',
                     collapseSuperGroups: true,
                     noSourceFeatureInfo: true,
                     featureInfoPlugin: function (f, info) {
@@ -120,7 +120,7 @@ angular.module('capseq')
                 },
                 {
                     name: 'Capture Transcripts - Melanoma',
-                    bwgURI: file_server + 'capture_transcript_melanoma_dirty_noas.bb',
+                    bwgURI: file_server + 'capture_transcript_melanoma.bb',
                     collapseSuperGroups: true,
                     noSourceFeatureInfo: true,
                     featureInfoPlugin: function (f, info) {
