@@ -79,7 +79,6 @@ angular.module('capseq')
             chr: '1',
             viewStart: 150727097,
             viewEnd: 150875437,
-            cookieKey: 'human',
 
             coordSystem: {
                 speciesName: 'Human',
