@@ -94,7 +94,6 @@ angular.module('capseq')
             chr: '1',
             viewStart: 150727097,
             viewEnd: 150875437,
-            cookieKey: 'human',
 
             coordSystem: {
                 speciesName: 'Human',
@@ -190,7 +189,7 @@ angular.module('capseq')
 
 
         var margin = {top: 20, right: 20, bottom: 30, left: 40},
-            width = 400 - margin.left - margin.right,
+            width = 520 - margin.left - margin.right,
             height = 300 - margin.top - margin.bottom;
 
 
@@ -244,10 +243,10 @@ angular.module('capseq')
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis)
-          .selectAll("text")
+            .selectAll("text")
+              .attr("y", 0)
+              .attr("x", 9)
             .attr("dy", ".35em")
-            .attr("dx", ".35em")
-
             .attr("transform", "rotate(90)")
             .style("text-anchor", "start");;
 
