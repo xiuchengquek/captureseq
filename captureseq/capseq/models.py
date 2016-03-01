@@ -25,6 +25,13 @@ class CapturedRegion(models.Model):
    end = models.IntegerField()
    strand = models.CharField(max_length=1)
 
+class TranscriptInfo(models.Model):
+    transcript_id = models.CharField(max_length=30)
+    exons = JSONField()
+
+
+
+
 
 
 

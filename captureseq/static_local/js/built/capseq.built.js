@@ -19,7 +19,7 @@ angular.module('capseq', [
 angular.module('capseq')
     .controller('GenomeController', ['$scope', '$rootScope', '$http', function ($scope, $rootScope, $http) {
 
-        var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/'
+        var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/';
         'use strict';
 
         function gencodeFIP(feature, info) {
@@ -48,7 +48,6 @@ angular.module('capseq')
             }
         }
 
-
         function widthData(data){
             var expression = [];
             angular.forEach(data, function(value, key){
@@ -58,12 +57,18 @@ angular.module('capseq')
         }
 
         function dataParser(feature, info, track) {
-            var url = track  + '/' +  feature.label
+            var url = track  + '/' +  feature.label;
             console.log(url)
             $http.get(url).then(function(results){
              $scope.$broadcast('expression_change', widthData(results.data.expression));
             });
             $scope.$digest();
+        }
+
+
+        function getTranscript(transcript_id){
+
+
 
 
         }
