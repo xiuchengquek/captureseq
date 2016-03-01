@@ -3,9 +3,9 @@
  */
 
 angular.module('capseq')
-    .controller('GenomeController', ['$scope', '$rootScope', function ($scope, $rootScope) {
+    .controller('GenomeController', ['$scope', '$rootScope', '$http' ,"$q", "$cookies", function ($scope, $rootScope, $http, $q) {
 
-        var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/'
+        var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/';
         'use strict';
 
         function gencodeFIP(feature, info) {
@@ -15,48 +15,70 @@ angular.module('capseq')
                     isGene = true;
                 }
             }
-
             if (!isGene) {
                 info.setTitle('Transcript: ' + feature.label);
                 info.add('Transcript ID', feature.label);
                 info.add('Transcript biotype', feature.method);
-
             } else {
                 info.setTitle('Gene: ' + feature.geneId);
             }
-
             info.add('Gene ID', feature.geneId);
             info.add('Gene name', feature.geneName);
             info.add('Gene biotype', feature.geneBioType);
-
             if (!isGene) {
                 info.add('Transcript attributes', feature.tags);
             }
         }
 
-        function dataParser(feature, info, track) {
-            console.log(feature, info)
-            info.setTitle('Gene : '+  feature.label)
-            info.add('Gene name', feature.geneName);
-
-
-
-            $scope.expression.transcript_name = feature.label;
-            $scope.expression.track = track;
-            angular.forEach($scope.expression.details, function(ele, idx){
-                ele.value = feature[ele.field_name]
-            });
-
-            $scope.$broadcast('expression_change', $scope.expression);
-            $scope.$digest();
-
-
+        function getTranscript(transcript_id){
+            var url = '/txinfo/' + transcript_id
+            return $http.get(url)
         }
 
+        function getExpression(transcript_id, track){
+            var url = track  + '/' +  transcript_id;
+            return $http.get(url)
+        }
+
+
+        function widthData(data){
+            var expression = [];
+            angular.forEach(data, function(value, key){
+                this.push({label : key, value : value})
+            }, expression);
+            return expression
+        }
+
+
+        function dataParser(feature, info, track) {
+            var transcript_id = feature.label;
+            var txinfo = getTranscript(transcript_id);
+            var expression = getExpression(transcript_id, track);
+
+            $q.all({ txinfo : txinfo, expression : expression })
+                .then(function(results){
+                    var expressionData = results.expression.data.expression;
+                     $scope.transcript_data = results.txinfo.data;
+                     $scope.transcript_data.track = track;
+                     $scope.$broadcast('expression_change', widthData(expressionData));
+            })
+        }
+
+        function getTranscript(transcript_id){
+            var url = '/txinfo/' + transcript_id
+            return $http.get(url)
+        }
+
+        function getExpression(transcript_id, track){
+            var url = track  + '/' +  transcript_id;
+            return $http.get(url)
+        }
+
+
         new Browser({
-            chr: '10',
-            viewStart: 115779011,
-            viewEnd: 115783011,
+            chr: '1',
+            viewStart: 150727097,
+            viewEnd: 150875437,
             cookieKey: 'human',
 
             coordSystem: {
@@ -87,43 +109,47 @@ angular.module('capseq')
                     featureInfoPlugin: gencodeFIP
                 },
                 {
-                    name: 'Capture Region - Body Atlas',
+                    name: 'Capture Region - Tissue',
                     bwgURI: file_server + 'captured_region_tissue.bb'
-                },
+              },
                 {
                     name: 'Capture Region - Melanoma',
                     bwgURI: file_server + 'captured_region_melanoma.bb'
                 },
                 {
-                    name: 'Capture Transcripts - Body Atlas',
+                    name: 'Capture Transcripts - Tissue',
                     bwgURI: file_server + 'captured_transcript_tissue_noex.bb',
+                    featureInfoPlugin : function(feat, info){
+                        dataParser(feat, info, 'tissue')
+                    }
                 },
                 {
                     name: 'Capture Transcripts - Melanoma',
                     bwgURI: file_server + 'captured_transcript_melanoma_noex.bb',
+                    featureInfoPlugin : function(feat, info){
+                        dataParser(feat, info, 'melanoma')
+                    }
+
                 }]
         });
 
-        $scope.expression = {transcript_name : '', track : '', details :
-                            [   { field_name : "field14", label :  "adipose" , value : 0 },
-                                { field_name : "field15", label :  "bladder" , value : 0 },
-                                { field_name : "field16", label :  "brain" , value : 0 },
-                                { field_name : "field17", label :  "breast" , value : 0 },
-                                { field_name : "field18", label :  "cervix" , value : 0 },
-                                { field_name : "field19", label :  "colon" , value : 0 },
-                                { field_name : "field20", label :  "esophagus" , value : 0 },
-                                { field_name : "field21", label :  "heart" , value : 0 },
-                                { field_name : "field22", label :  "kidney" , value : 0 },
-                                { field_name : "field23", label :  "liver" , value : 0 },
-                                { field_name : "field24", label :  "lung" , value : 0 },
-                                { field_name : "field25", label :  "ovary" , value : 0 },
-                                { field_name : "field26", label :  "placenta" , value : 0 },
-                                { field_name : "field27", label :  "prostate" , value : 0 },
-                                { field_name : "field28", label :  "skmusc" , value : 0 },
-                                { field_name : "field29", label :  "smint" , value : 0 },
-                                { field_name : "field30", label :  "spleen" , value : 0 },
-                                { field_name : "field31", label :  "testes" , value : 0 },
-                                { field_name : "field32", label :  "thymus" , value : 0 },
-                                { field_name : "field33", label :  "thyroid" , value : 0 },
-                                { field_name : "field34", label :  "trachea"   , value : 0 }] }
+        function load_default(){
+
+            var txinfo = getTranscript('TCONS_00047715');
+            var expressionData =  getExpression('TCONS_00047715', 'melanoma');
+
+            $q.all({ txinfo : txinfo, expression : expressionData })
+                .then(function(results){
+                    var expressionData = results.expression.data.expression;
+                     $scope.transcript_data = results.txinfo.data;
+                     $scope.transcript_data.track = 'melanoma';
+                     $scope.$broadcast('expression_change', widthData(expressionData));
+            })
+
+
+        }
+
+
+        load_default()
+
     }]);

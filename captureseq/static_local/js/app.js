@@ -5,7 +5,8 @@
 
 // Declare app level module which depends on views, and components
 angular.module('capseq', [
-    'ngRoute'
+    'ngRoute',
+    'ngCookies'
 ]).
     config(['$interpolateProvider', function($interpolateProvider) {
       $interpolateProvider.startSymbol('[[');
