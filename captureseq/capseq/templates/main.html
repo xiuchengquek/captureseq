@@ -61,11 +61,33 @@
     <div class="row">
         <div class="col-md-1"></div>
             <div class="col-md-5" >
+                <h3> Expression [[ transcript_data.transcript_id ]]</h3>
+
                 <bar-chart id="expression" data="expression.expression" transcript_id = 'transcript_id'></bar-chart>
             </div>
             <div class="col-md-5">
-                <div id="transcript_info">
-                    [[ expression.transcript_name]]
+                <div id="transcript_info"  >
+                    <h3> Transcript name [[ transcript_data.transcript_id ]]</h3>
+                     <p>track: [[ transcript_data.track ]]</p>
+                    <table class="table table-striped">
+                        <tr>
+                        <th>Chr</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Exon Number</th>
+                        <th>Strand</th>
+                        </tr>
+                        <tr ng-repeat="exon in  transcript_data.exons |  orderBy: 'exon_number'">
+                            <td>[[ exon.chr ]]</td>
+                            <td>[[ exon.start ]]</td>
+                            <td>[[ exon.end ]]</td>
+                            <td>[[ exon.exon_number ]]</td>
+                            <td>[[ exon.strand ]]</td>
+                        </tr>
+                    </table>
+
+
+
                 </div>
             </div>
         <div class="col-md-1"></div>

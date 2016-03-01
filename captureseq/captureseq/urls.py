@@ -24,4 +24,7 @@ urlpatterns = [
     url(r'^', include('capseq.urls')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/', admin.site.urls),
+    url(r'^docs/', include('rest_framework_swagger.urls'))
+
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

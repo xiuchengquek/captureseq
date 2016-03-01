@@ -27,6 +27,9 @@ class TissueSerializer(serializers.HyperlinkedModelSerializer):
         return obj.expression
 
 class TranscriptInfoSerializer(serializers.HyperlinkedModelSerializer):
+    """
+    A simple ViewSet for viewing accounts.
+    """
     exons = serializers.SerializerMethodField('clean_exons')
     class Meta:
         model = TranscriptInfo
@@ -41,9 +44,10 @@ class TranscriptInfoViewSet(viewsets.ViewSet):
     def list(self,request):
         queryset = TranscriptInfo.objects.all()
         serializer = TranscriptInfoSerializer(queryset, many=True)
-        return Response(serializer.data)
+        data = [x['transcript_id'] for x in serializer.data]
+        return Response(data)
 
-    def retrieve(self, request, transcript_id=None):
+    def get(self, request, transcript_id=None):
         queryset = TranscriptInfo.objects.all()
         data = get_object_or_404(queryset, transcript_id=transcript_id)
         serializer = TranscriptInfoSerializer(data)
@@ -55,7 +59,8 @@ class MelanomaViewSet(viewsets.ViewSet):
     def list(self,request):
         queryset = MelanomaExpression.objects.all()
         serializer = MelanomaSerializer(queryset, many=True)
-        return Response(serializer.data)
+        data = [x['transcript_id'] for x in serializer.data]
+        return Response(data)
 
     def retrieve(self, request, transcript_id=None):
         queryset = MelanomaExpression.objects.all()
@@ -70,7 +75,8 @@ class TissueViewSet(viewsets.ViewSet):
     def list(self,request):
         queryset = TissueExpression.objects.all()
         serializer = TissueExpression(queryset, many=True)
-        return Response(serializer.data)
+        data = [x['transcript_id'] for x in serializer.data]
+        return Response(data)
 
     def retrieve(self, request, transcript_id=None):
         queryset = TissueExpression.objects.all()
