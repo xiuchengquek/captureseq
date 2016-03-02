@@ -14,9 +14,6 @@ angular.module('capseq')
     }])
     .factory('dataLoader',  ['$http', '$q', function($http, $q){
 
-
-
-
         function getTranscript(transcript_id){
             var url = '/txinfo/' + transcript_id
             return $http.get(url)
@@ -35,17 +32,7 @@ angular.module('capseq')
             }, expression);
             return expression
         }
-
-
-
-
-
-
-
-
-
-
-    }])
+    }]);
 
 
 

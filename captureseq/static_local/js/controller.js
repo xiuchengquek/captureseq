@@ -4,9 +4,13 @@
 
 angular.module('capseq')
     .controller('GenomeController', ['$scope', '$rootScope', '$http' ,"$q", "$cookies", function ($scope, $rootScope, $http, $q) {
+        $scope.selectedregion = {'chr' : 0}
 
         var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/';
         'use strict';
+
+
+
 
         function gencodeFIP(feature, info) {
             var isGene = false;
@@ -65,7 +69,7 @@ angular.module('capseq')
         }
 
         function getTranscript(transcript_id){
-            var url = '/txinfo/' + transcript_id
+            var url = '/txinfo/' + transcript_id;
             return $http.get(url)
         }
 
@@ -74,8 +78,13 @@ angular.module('capseq')
             return $http.get(url)
         }
 
+        function getRegionList(){
+            var url = '/capturedregions/';
+            return $http.get(url)
+        }
 
-        new Browser({
+
+        var browser = new Browser({
             chr: '1',
             viewStart: 150727097,
             viewEnd: 150875437,
@@ -132,17 +141,35 @@ angular.module('capseq')
                 }]
         });
 
+
+        $scope.$on('browserchanged', function(e,d ){
+
+            console.log($scope.selectedregion)
+
+            console.log(browser.chr)
+
+           browser.setLocation(d.chr.toString(), d.start, d.end);
+
+
+        })
+
+
+
         function load_default(){
 
             var txinfo = getTranscript('TCONS_00047715');
             var expressionData =  getExpression('TCONS_00047715', 'melanoma');
+            var regionList = getRegionList();
 
-            $q.all({ txinfo : txinfo, expression : expressionData })
+            $q.all({ txinfo : txinfo, expression : expressionData, regionList :  regionList})
                 .then(function(results){
                     var expressionData = results.expression.data.expression;
                      $scope.transcript_data = results.txinfo.data;
                      $scope.transcript_data.track = 'melanoma';
+                     $scope.region = results.regionList.data;
                      $scope.$broadcast('expression_change', widthData(expressionData));
+                     $scope.$broadcast('region_change', results.regionList.data);
+
             })
 
 
@@ -150,5 +177,6 @@ angular.module('capseq')
 
 
         load_default()
+
 
     }]);

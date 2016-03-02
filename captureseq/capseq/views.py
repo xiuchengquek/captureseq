@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
 from rest_framework import serializers
-from models import MelanomaExpression, TissueExpression, TranscriptInfo
+from models import MelanomaExpression, TissueExpression, TranscriptInfo, CapturedRegion
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -9,6 +9,16 @@ import json
 
 class MainPageView(TemplateView):
     template_name = "main.html"
+
+
+class CapturedRegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CapturedRegion
+        fields = ('chr', 'start','end', 'strand', 'width', 'track')
+
+class CapturedRegionViewSet(viewsets.ModelViewSet):
+    queryset = CapturedRegion.objects.all()
+    serializer_class = CapturedRegionSerializer
 
 class MelanomaSerializer(serializers.HyperlinkedModelSerializer):
     expression = serializers.SerializerMethodField('clean_expression')

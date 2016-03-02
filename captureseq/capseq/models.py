@@ -19,11 +19,14 @@ class TissueExpression(models.Model):
     expression = JSONField()
 
 class CapturedRegion(models.Model):
-   captured_id = models.CharField(max_length=30)
-   chrom = models.CharField(max_length=10)
-   start = models.IntegerField()
-   end = models.IntegerField()
-   strand = models.CharField(max_length=1)
+    chr = models.IntegerField()
+    start = models.IntegerField()
+    end = models.IntegerField()
+    width = models.IntegerField()
+
+    strand = models.CharField(max_length=1)
+    name = models.CharField(max_length=100)
+    track = models.CharField(max_length=30)
 
 class TranscriptInfo(models.Model):
     transcript_id = models.CharField(max_length=30)

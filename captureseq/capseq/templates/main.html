@@ -29,7 +29,7 @@
 }
 
 .axis path,
-.axis line {
+#expression.axis line {
   fill: none;
   stroke: #000;
   shape-rendering: crispEdges;
@@ -51,6 +51,42 @@
 
   </div>
 </nav>
+    <div class="row" >
+        <div class="col-md-1"></div>
+        <div class="col-md-7">
+            <h3> Genomic Snapshot of Captured Region </h3>
+            <genome-navigator id="navigator" region="region" selectedregion="selectedregion">
+
+
+
+            </genome-navigator>
+
+        </div>
+        <div class="col-md-3">
+            <h3>Selected Region </h3>
+                <table class="table table-striped">
+                        <tr>
+                        <td>Chr</td><td> [[ selectedregion.chr ]]</td>
+                        </tr>
+                        <tr>
+                        <td>Start</td><td> [[ selectedregion.start ]]</td>
+                        </tr>
+                        <tr>
+                        <td>End</td><td> [[ selectedregion.end ]]</td>
+
+                        </tr>
+                        <tr>
+                        <td>Region Width</td><td> [[ selectedregion.width ]]</td>
+                        </tr>
+
+
+
+                    </table>
+
+
+        </div>
+        <div class="col-md-1"></div>
+    </div>
     <div class="row" >
         <div class="col-md-1"></div>
         <div class="col-md-10">
