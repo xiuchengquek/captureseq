@@ -140,14 +140,14 @@ angular.module('capseq')
                 },
                 {
                     name: 'Capture Transcripts - Tissue',
-                    bwgURI: file_server + 'captured_transcript_tissue_noex.bb',
+                    bwgURI: file_server + 'captured_transcript_tissue_single_noex.bb',
                     featureInfoPlugin : function(feat, info){
                         dataParser(feat, info, 'tissue')
                     }
                 },
                 {
                     name: 'Capture Transcripts - Melanoma',
-                    bwgURI: file_server + 'captured_transcript_melanoma_noex.bb',
+                    bwgURI: file_server + 'captured_transcript_melanoma_single_noex.bb',
                     featureInfoPlugin : function(feat, info){
                         dataParser(feat, info, 'melanoma')
                     }
