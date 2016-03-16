@@ -52,7 +52,6 @@ module.exports = function(grunt) {
             }
 
         },
-
         watch: {
             scripts:{
                 files: ['captureseq/capseq/static/js/*.js','captureseq/capseq/static/js/genomeView/*.js'] ,
@@ -61,26 +60,14 @@ module.exports = function(grunt) {
                     spawn : false,
                 }
             }
-
         },
-
-
         copy: {
-
             main : {
-
-                files : [
-                    {expand: true ,  cwd: 'public/lib/', src : ['components-font-awesome/**'], dest : 'captureseq/static/'}
-
+                files: [
+                    {expand: true, cwd: 'public/lib/', src: ['components-font-awesome/**'], dest: 'captureseq/static/'}
                 ]
-
             }
-
-
         }
-
-
-
         });
 
     // Load the plugin that provides the "uglify" task.
