@@ -53,7 +53,7 @@
                         <th>Association PValue</th>
                         </tr>
                         <tr ng-repeat="snps in selectedregion.details.snps">
-                            <td>[[ snps.snp_id ]] </td>
+                            <td><a href="https://www.ebi.ac.uk/gwas/search?query=[[ snps.snp_id ]]" target="_blank"> [[snps.snp_id]] </a> </td>
                             <td>[[ snps.pubmed || '-']] </td>
                             <td>[[ snps.pvalue || '-' ]] </td>
                         </tr>
