@@ -9,9 +9,6 @@ angular.module('capseq')
         var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/';
         'use strict';
 
-
-
-
         function gencodeFIP(feature, info) {
             var isGene = false;
             for (var hi = 0; hi < info.hit.length; ++hi) {
@@ -54,6 +51,8 @@ angular.module('capseq')
         }
 
 
+
+
         function dataParser(feature, info, track) {
             var transcript_id = feature.label;
             var txinfo = getTranscript(transcript_id);
@@ -61,7 +60,7 @@ angular.module('capseq')
 
             $q.all({ txinfo : txinfo, expression : expression })
                 .then(function(results){
-                    var expressionData = results.expression.data.expression;
+                     var expressionData = results.expression.data.expression;
                      $scope.transcript_data = results.txinfo.data;
                      $scope.transcript_data.track = track;
                      $scope.$broadcast('expression_change', widthData(expressionData));
@@ -126,14 +125,14 @@ angular.module('capseq')
                 },
                 {
                     name: 'Capture Transcripts - Tissue',
-                    bwgURI: file_server + 'captured_transcript_tissue_noex.bb',
+                    bwgURI: file_server + 'captured_transcript_tissue_single_noex.bb',
                     featureInfoPlugin : function(feat, info){
                         dataParser(feat, info, 'tissue')
                     }
                 },
                 {
                     name: 'Capture Transcripts - Melanoma',
-                    bwgURI: file_server + 'captured_transcript_melanoma_noex.bb',
+                    bwgURI: file_server + 'captured_transcript_melanoma_single_noex.bb',
                     featureInfoPlugin : function(feat, info){
                         dataParser(feat, info, 'melanoma')
                     }
@@ -143,15 +142,8 @@ angular.module('capseq')
 
 
         $scope.$on('browserchanged', function(e,d ){
-
-            console.log($scope.selectedregion)
-
-            console.log(browser.chr)
-
            browser.setLocation(d.chr.toString(), d.start, d.end);
-
-
-        })
+        });
 
 
 
@@ -163,7 +155,7 @@ angular.module('capseq')
 
             $q.all({ txinfo : txinfo, expression : expressionData, regionList :  regionList})
                 .then(function(results){
-                    var expressionData = results.expression.data.expression;
+                     var expressionData = results.expression.data.expression;
                      $scope.transcript_data = results.txinfo.data;
                      $scope.transcript_data.track = 'melanoma';
                      $scope.region = results.regionList.data;
