@@ -319,6 +319,15 @@ angular.module('capseq')
                         .data(data)
                         .enter().append("rect")
                         .classed("feature", true)
+                        .classed("selected", function(d){
+                            if (d.track == "melanoma" && d.chr == 1){
+                                return true
+                            }else{
+                                return false
+                            }
+
+
+                        })
                         .attr("transform", transform)
                         .attr("height", 10)
                         .attr("width", function (d) {
@@ -326,15 +335,22 @@ angular.module('capseq')
                         })
                         .style('fill', function(d) {
 
+
+
+
                             return colorScale[d.track]
-
-
                         })
-                            .on('click', function (d) {
+                        .on('click', function (d) {
+                            d3.selectAll(".selected").classed('selected', false);
+                            d3.select(this).classed('selected', true);
+
+
                             scope.$apply(function () {
+
                                 scope.selectedregion = d;
 
-                            })
+                            });
+
                                 scope.$emit('browserchanged', d);
 
 
