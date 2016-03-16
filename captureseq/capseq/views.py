@@ -8,13 +8,19 @@ from rest_framework.response import Response
 import json
 
 class MainPageView(TemplateView):
-    template_name = "main.html"
+    template_name = "data_row.html"
 
 
 class CapturedRegionSerializer(serializers.ModelSerializer):
+    details = serializers.SerializerMethodField('clean_details')
     class Meta:
         model = CapturedRegion
-        fields = ('chr', 'start','end', 'strand', 'width', 'track')
+        fields = ('chr', 'start','end', 'strand', 'width', 'track', 'details')
+    def clean_details(self, obj):
+        return obj.details
+
+
+
 
 class CapturedRegionViewSet(viewsets.ModelViewSet):
     queryset = CapturedRegion.objects.all()

@@ -115,7 +115,6 @@ angular.module('capseq')
 
 
                 scope.$on('region_change', function (event, data) {
-                    console.log(scope.selectedregion)
 
                     var chromSizes =
                     {
@@ -145,7 +144,7 @@ angular.module('capseq')
 
 
                     var margin = {top: 20, right: 20, bottom: 30, left: 40},
-                        width = 1000 - margin.left - margin.right,
+                        width = 800 - margin.left - margin.right,
                         height = 600 - margin.top - margin.bottom;
 
                     var chr = [];
@@ -232,7 +231,12 @@ angular.module('capseq')
                     var xAxis = d3.svg.axis()
                         .scale(x)
                         .orient("bottom")
-                        .tickSize(-height)
+                        .tickSize(-height);
+
+                    var colorScale = {
+                        'tissue' : '#17becf',
+                        'melanoma' : ' #d62728'
+                    };
 
 
                     var yAxis = d3.svg.axis().scale(y)
@@ -320,18 +324,18 @@ angular.module('capseq')
                         .attr("width", function (d) {
                             return x(d.width)
                         })
-                        .style('fill', 'red')
-                        .on('click', function (d) {
+                        .style('fill', function(d) {
+
+                            return colorScale[d.track]
 
 
-                            console.log(d)
-
-
+                        })
+                            .on('click', function (d) {
                             scope.$apply(function () {
                                 scope.selectedregion = d;
 
                             })
-                            scope.$emit('browserchanged', d);
+                                scope.$emit('browserchanged', d);
 
 
 

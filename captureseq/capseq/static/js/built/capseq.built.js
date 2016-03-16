@@ -24,9 +24,6 @@ angular.module('capseq')
         var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/';
         'use strict';
 
-
-
-
         function gencodeFIP(feature, info) {
             var isGene = false;
             for (var hi = 0; hi < info.hit.length; ++hi) {
@@ -69,6 +66,8 @@ angular.module('capseq')
         }
 
 
+
+
         function dataParser(feature, info, track) {
             var transcript_id = feature.label;
             var txinfo = getTranscript(transcript_id);
@@ -76,7 +75,7 @@ angular.module('capseq')
 
             $q.all({ txinfo : txinfo, expression : expression })
                 .then(function(results){
-                    var expressionData = results.expression.data.expression;
+                     var expressionData = results.expression.data.expression;
                      $scope.transcript_data = results.txinfo.data;
                      $scope.transcript_data.track = track;
                      $scope.$broadcast('expression_change', widthData(expressionData));
@@ -158,15 +157,8 @@ angular.module('capseq')
 
 
         $scope.$on('browserchanged', function(e,d ){
-
-            console.log($scope.selectedregion)
-
-            console.log(browser.chr)
-
            browser.setLocation(d.chr.toString(), d.start, d.end);
-
-
-        })
+        });
 
 
 
@@ -178,7 +170,7 @@ angular.module('capseq')
 
             $q.all({ txinfo : txinfo, expression : expressionData, regionList :  regionList})
                 .then(function(results){
-                    var expressionData = results.expression.data.expression;
+                     var expressionData = results.expression.data.expression;
                      $scope.transcript_data = results.txinfo.data;
                      $scope.transcript_data.track = 'melanoma';
                      $scope.region = results.regionList.data;
@@ -313,7 +305,6 @@ angular.module('capseq')
 
 
                 scope.$on('region_change', function (event, data) {
-                    console.log(scope.selectedregion)
 
                     var chromSizes =
                     {
@@ -343,7 +334,7 @@ angular.module('capseq')
 
 
                     var margin = {top: 20, right: 20, bottom: 30, left: 40},
-                        width = 1000 - margin.left - margin.right,
+                        width = 800 - margin.left - margin.right,
                         height = 600 - margin.top - margin.bottom;
 
                     var chr = [];
@@ -430,7 +421,12 @@ angular.module('capseq')
                     var xAxis = d3.svg.axis()
                         .scale(x)
                         .orient("bottom")
-                        .tickSize(-height)
+                        .tickSize(-height);
+
+                    var colorScale = {
+                        'tissue' : '#17becf',
+                        'melanoma' : ' #d62728'
+                    };
 
 
                     var yAxis = d3.svg.axis().scale(y)
@@ -518,18 +514,18 @@ angular.module('capseq')
                         .attr("width", function (d) {
                             return x(d.width)
                         })
-                        .style('fill', 'red')
-                        .on('click', function (d) {
+                        .style('fill', function(d) {
+
+                            return colorScale[d.track]
 
 
-                            console.log(d)
-
-
+                        })
+                            .on('click', function (d) {
                             scope.$apply(function () {
                                 scope.selectedregion = d;
 
                             })
-                            scope.$emit('browserchanged', d);
+                                scope.$emit('browserchanged', d);
 
 
 

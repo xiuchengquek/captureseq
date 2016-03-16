@@ -21,6 +21,7 @@ module.exports = function(grunt) {
                     'public/lib/lodash/dist/lodash.js',
                     'public/lib/d3/d3.min.js',
                     'public/lib/angular-cookies/angular-cookies.min.js'
+
                      ],
                 dest: 'captureseq/static/js/dependencies.js'
 

@@ -23,10 +23,12 @@ class CapturedRegion(models.Model):
     start = models.IntegerField()
     end = models.IntegerField()
     width = models.IntegerField()
-
     strand = models.CharField(max_length=1)
     name = models.CharField(max_length=100)
     track = models.CharField(max_length=30)
+    details = JSONField()
+
+
 
 class TranscriptInfo(models.Model):
     transcript_id = models.CharField(max_length=30)

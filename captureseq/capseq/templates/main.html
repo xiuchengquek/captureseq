@@ -8,8 +8,8 @@
     <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <link rel="stylesheet" href="{% static 'css/built.css' %}">
     <script src="{% static 'js/dependencies.js' %}"></script>
-    <script type="text/javascript" src="http://www.biodalliance.org/release-0.13/dalliance-compiled.js"></script>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+   <!-- <script type="text/javascript" src="http://www.biodalliance.org/release-0.13/dalliance-compiled.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> -->
 
 
     <style>
@@ -54,7 +54,7 @@
     <div class="row" >
         <div class="col-md-1"></div>
         <div class="col-md-7">
-            <h3> Genomic Snapshot of Captured Region </h3>
+            <h3>Captured Regions (zoom and select)</h3>
             <genome-navigator id="navigator" region="region" selectedregion="selectedregion">
 
 
@@ -79,9 +79,19 @@
                         <td>Region Width</td><td> [[ selectedregion.width ]]</td>
                         </tr>
 
+                        <tr ng-repeat="disease in selectedregion.details.disease">
+                            <td>
+                                [[ disease ]]
+                            </td>
+                        </tr>
+
+
+
+
 
 
                     </table>
+
 
 
         </div>

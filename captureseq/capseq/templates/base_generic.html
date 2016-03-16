@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="capseq">
+<head>
+    {% load staticfiles %}
+    <meta charset="UTF-8">
+    <title>Capture Seq</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="{% static 'css/built.css' %}">
+    <script src="{% static 'js/dependencies.js' %}"></script>
+    <<script type="text/javascript" src="http://www.biodalliance.org/release-0.13/dalliance-compiled.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+
+
+
+    .bar {
+      fill: steelblue;
+    }
+
+    .bar:hover {
+      fill: brown;
+    }
+
+    .axis {
+      font: 10px sans-serif;
+    }
+
+    .axis path,
+    #expression.axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .x.axis path {
+      display: none;
+    }
+
+    li.tissue {
+      color: #17becf;
+
+    }
+    li.melanoma {
+        color : #d62728;
+    }
+
+
+    </style>
+
+</head>
+<body  ng-controller="GenomeController">
+<nav class="navbar navbar-default navbar-static-top">
+  <div class="container">
+    <a class="navbar-brand" href="#">CaptureSeq</a>
+  </div>
+</nav>
+        {% block navigator %}
+        {% endblock %}
+        {% block genomebrowser %}
+        {% endblock %}
+        {% block expression %}
+        {% endblock %}
+    <script src="{% static 'js/built/capseq.built.js' %}"></script>
+</body>
+</html>

@@ -145,7 +145,7 @@ angular.module('capseq')
 
 
                     var margin = {top: 20, right: 20, bottom: 30, left: 40},
-                        width = 1000 - margin.left - margin.right,
+                        width = 800 - margin.left - margin.right,
                         height = 600 - margin.top - margin.bottom;
 
                     var chr = [];
@@ -236,7 +236,7 @@ angular.module('capseq')
 
 
                     var yAxis = d3.svg.axis().scale(y)
-                        .orient("left")
+                        .orient("right")
                         .tickValues(chr.map(function (d) {
                             return parseInt(d.chr)
                         }))

@@ -1,0 +1,116 @@
+{% extends "base_generic.html" %}
+
+
+{% block navigator %}
+<div class="row" >
+    <div class="col-md-1"></div>
+    <div class="col-md-7">
+        <h3> Captured Regions (zoom and select) </h3>
+        <ul class="list-inline">
+            <li class="tissue"> Tissue Captured Region </li>
+            <li class="melanoma">Melanoma Captured Region </li>
+        </ul>
+        <genome-navigator id="navigator" region="region" selectedregion="selectedregion"></genome-navigator>
+    </div>
+     <div class="col-md-3">
+                <h3>Selected Region </h3>
+                    <table class="table table-striped">
+                            <tr>
+                            <td>Chr</td><td> [[ selectedregion.chr ]]</td>
+                            </tr>
+                            <tr>
+                            <td>Start</td><td> [[ selectedregion.start ]]</td>
+                            </tr>
+                            <tr>
+                            <td>End</td><td> [[ selectedregion.end ]]</td>
+
+                            </tr>
+                            <tr>
+                            <td>Region Width</td><td> [[ selectedregion.width ]]</td>
+                            </tr>
+                            <tr>
+                            <td>Track </td><td> [[ selectedregion.track ]]</td>
+                            </tr>
+
+
+
+
+                        </table>
+                <h3>Associated Disease </h3>
+                    <table class="table table-striped">
+                        <tr ng-repeat="diseases in selectedregion.details.disease">
+                                <td>[[ diseases ]] </td>
+                        </tr>
+                    </table>
+                <h3>Associated Snps </h3>
+                  <table class="table table-striped">
+                        <tr>
+                        <th>RefSnp Id</th>
+                        <th>Pubmed</th>
+                        <th>Association PValue</th>
+                        </tr>
+                        <tr ng-repeat="snps in selectedregion.details.snps">
+                            <td>[[ snps.snp_id ]] </td>
+                            <td>[[ snps.pubmed || '-']] </td>
+                            <td>[[ snps.pvalue || '-' ]] </td>
+                        </tr>
+                    </table>
+
+
+
+
+     </div>
+     <div class="col-md-1"></div>
+</div>
+{% endblock %}
+
+
+{% block genomebrowser %}
+    <div class="row" >
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+                <div id="svgHolder"></div>
+        </div>
+        <div class="col-md-1"></div>
+    </div>
+{% endblock %}
+
+
+{% block expression %}
+
+    <div class="row">
+        <div class="col-md-1"></div>
+            <div class="col-md-5" >
+                <h3> Expression [[ transcript_data.transcript_id ]]</h3>
+
+                <bar-chart id="expression" data="expression.expression" transcript_id = 'transcript_id'></bar-chart>
+            </div>
+            <div class="col-md-5">
+                <div id="transcript_info"  >
+                    <h3> Transcript name [[ transcript_data.transcript_id ]]</h3>
+                     <p>track: [[ transcript_data.track ]]</p>
+                    <table class="table table-striped">
+                        <tr>
+                        <th>Chr</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Exon Number</th>
+                        <th>Strand</th>
+                        </tr>
+                        <tr ng-repeat="exon in  transcript_data.exons |  orderBy: 'exon_number'">
+                            <td>[[ exon.chr ]]</td>
+                            <td>[[ exon.start ]]</td>
+                            <td>[[ exon.end ]]</td>
+                            <td>[[ exon.exon_number ]]</td>
+                            <td>[[ exon.strand ]]</td>
+                        </tr>
+                    </table>
+
+
+
+                </div>
+            </div>
+        <div class="col-md-1"></div>
+    </div>
+{% endblock %}
+
