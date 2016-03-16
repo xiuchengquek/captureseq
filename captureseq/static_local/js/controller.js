@@ -4,7 +4,18 @@
 
 angular.module('capseq')
     .controller('GenomeController', ['$scope', '$rootScope', '$http' ,"$q", "$cookies", function ($scope, $rootScope, $http, $q) {
-        $scope.selectedregion = {'chr' : 0}
+        $scope.selectedregion = {chr : 1, start : 150534367, end : 150960349,
+            'Region Width' : 425983,  track : 'melanoma',
+         details: {
+            snps: [
+                {
+                    snp_id: "rs7412746"}
+            ],
+            disease: [
+                "melanoma"
+            ]
+        }
+        }
 
         var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/';
         'use strict';
@@ -87,6 +98,7 @@ angular.module('capseq')
             chr: '1',
             viewStart: 150727097,
             viewEnd: 150875437,
+            noPersist : true,
 
             coordSystem: {
                 speciesName: 'Human',
