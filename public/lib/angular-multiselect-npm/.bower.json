@@ -1,0 +1,14 @@
+{
+  "name": "angular-multiselect-npm",
+  "homepage": "https://github.com/alexandernst/angular-multi-select",
+  "version": "7.4.1",
+  "_release": "7.4.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "7.4.1",
+    "commit": "c6d5d2e1a36a49fb18edc4f205aaba3d6a97ac5c"
+  },
+  "_source": "https://github.com/alexandernst/angular-multi-select.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/alexandernst/angular-multi-select.git"
+}

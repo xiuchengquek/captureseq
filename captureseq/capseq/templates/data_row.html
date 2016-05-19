@@ -2,6 +2,71 @@
 
 
 {% block navigator %}
+
+
+{%verbatim%}
+
+<div class= "row">
+    <div class="col-md-2"></div>
+
+                 <div class="col-md-2"><label>Filter Regions By Associated Diseases :
+        <div
+
+            angular-multi-select
+            input-model="input_data"
+            output-model="output_data"
+
+            dropdown-label="<[
+                <# angularMultiSelectConstants.INTERNAL_STATS_TOTAL_LEAFS #> === undefined ? 'No available items' :
+                    <# angularMultiSelectConstants.INTERNAL_STATS_CHECKED_LEAFS #> === 0 ? 'No checked items' :
+                        <# angularMultiSelectConstants.INTERNAL_STATS_CHECKED_LEAFS #> + ' checked ' + (<# angularMultiSelectConstants.INTERNAL_STATS_CHECKED_LEAFS #> === 1 ? 'item': 'items')
+            ]>"
+            node-label="<[ text ]> (checked
+                <# angularMultiSelectConstants.INTERNAL_KEY_CHECKED_CHILDREN #> /
+                <# angularMultiSelectConstants.INTERNAL_KEY_CHILDREN_LEAFS #>)"
+            leaf-label="<[ text ]> (<[ value ]>)"
+
+            search-field="text"
+        >
+
+
+
+        </div></label>
+                        </div>
+
+        <div class="col-md-2">
+            <label>
+             Filter by Ref Snp Id
+
+
+            <input autocomplete id='refsearch' results= 'snpid' type="text" class="form-control" placeholder="snpID"  change-event="snpChanged(snpid.value)" suggestions="availableSnps" />
+            </label>
+            <span ng-if="snpid.value === false"> not found in captured region</span>
+
+
+
+        </div>
+
+        <div class="col-md-2">
+
+
+
+
+
+        </div>
+
+        <div class="col-md-2">
+
+
+
+
+
+        </div>
+
+
+     <div class="col-md-2"></div>
+</div>
+
 <div class="row" >
     <div class="col-md-1"></div>
     <div class="col-md-7">
@@ -10,39 +75,96 @@
             <li class="selected">Selected Captured Region </li>
             <li class="tissue"> Tissue Captured Region </li>
             <li class="melanoma">Melanoma Captured Region </li>
-
-
         </ul>
-        <genome-navigator id="navigator" region="region" selectedregion="selectedregion"></genome-navigator>
+
+        <genome-navigator id="navigator" region="region" selectedregion="selectedregion"  displayed-region = 'displayed_region' ></genome-navigator>
     </div>
+
+
+
+    <div>
+        <script type="text/ng-template" id="myModalContent.html">
+            <div class="modal-header">
+                <h3 class="modal-title">I'm a modal!</h3>
+            </div>
+            <div class="modal-body">
+                <h3>Selected Region </h3>
+                <table class="table table-striped">
+                        <tr>
+                        <td>Chr</td><td> {{ regionDetails.chr || "1"}}</td>
+                        </tr>
+                        <tr>
+                        <td>Start</td><td> {{ regionDetails.start || "150534367"}}</td>
+                        </tr>
+                        <tr>
+                        <td>End</td><td> {{ regionDetails.end || "150960349" }}</td>
+
+                        </tr>
+                        <tr>
+                        <td>Region Width</td><td> {{ regionDetails.width || "425983" }}</td>
+                        </tr>
+                        <tr>
+                        <td>Track </td><td> {{ regionDetails.track || "melanoma" }}</td>
+                        </tr>
+                    </table>
+            <h3>Associated Disease </h3>
+                <table class="table table-striped">
+                    <tr ng-repeat="diseases in regionDetails.details.disease">
+                            <td>{{ diseases }} </td>
+                    </tr>
+                </table>
+            <h3>Associated Snps </h3>
+              <table class="table table-striped">
+                    <tr>
+                    <th>RefSnp Id</th>
+                    <th>Pubmed</th>
+                    <th>Association PValue</th>
+                    </tr>
+                    <tr ng-repeat="snps in selectedregion.details.snps">
+                        <td><a href="https://www.ebi.ac.uk/gwas/search?query={{ snps.snp_id }}" target="_blank"> {{snps.snp_id}} </a> </td>
+                        <td>{{ snps.pubmed || '-'}} </td>
+                        <td>{{ snps.pvalue || '-' }} </td>
+                    </tr>
+                </table>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+                <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+            </div>
+        </script>
+
+        <div ng-show="selected">Selection from a modal: {{ selected }}</div>
+    </div>
+
+
+
+
      <div class="col-md-3">
+
                 <h3>Selected Region </h3>
                     <table class="table table-striped">
                             <tr>
-                            <td>Chr</td><td> [[ selectedregion.chr || "1"]]</td>
+                            <td>Chr</td><td> {{ selectedregion.chr || "1"}}</td>
                             </tr>
                             <tr>
-                            <td>Start</td><td> [[ selectedregion.start || "150534367"]]</td>
+                            <td>Start</td><td> {{ selectedregion.start || "150534367"}}</td>
                             </tr>
                             <tr>
-                            <td>End</td><td> [[ selectedregion.end || "150960349" ]]</td>
+                            <td>End</td><td> {{ selectedregion.end || "150960349" }}</td>
 
                             </tr>
                             <tr>
-                            <td>Region Width</td><td> [[ selectedregion.width || "425983" ]]</td>
+                            <td>Region Width</td><td> {{ selectedregion.width || "425983" }}</td>
                             </tr>
                             <tr>
-                            <td>Track </td><td> [[ selectedregion.track || "melanoma" ]]</td>
+                            <td>Track </td><td> {{ selectedregion.track || "melanoma" }}</td>
                             </tr>
-
-
-
-
                         </table>
                 <h3>Associated Disease </h3>
                     <table class="table table-striped">
                         <tr ng-repeat="diseases in selectedregion.details.disease">
-                                <td>[[ diseases ]] </td>
+                                <td>{{ diseases }} </td>
                         </tr>
                     </table>
                 <h3>Associated Snps </h3>
@@ -53,9 +175,9 @@
                         <th>Association PValue</th>
                         </tr>
                         <tr ng-repeat="snps in selectedregion.details.snps">
-                            <td><a href="https://www.ebi.ac.uk/gwas/search?query=[[ snps.snp_id ]]" target="_blank"> [[snps.snp_id]] </a> </td>
-                            <td>[[ snps.pubmed || '-']] </td>
-                            <td>[[ snps.pvalue || '-' ]] </td>
+                            <td><a href="https://www.ebi.ac.uk/gwas/search?query={{ snps.snp_id }}" target="_blank"> {{snps.snp_id}} </a> </td>
+                            <td>{{ snps.pubmed || '-'}} </td>
+                            <td>{{ snps.pvalue || '-' }} </td>
                         </tr>
                     </table>
 
@@ -65,6 +187,8 @@
      </div>
      <div class="col-md-1"></div>
 </div>
+{%endverbatim%}
+
 {% endblock %}
 
 
@@ -80,18 +204,19 @@
 
 
 {% block expression %}
+{%verbatim%}
 
     <div class="row">
         <div class="col-md-1"></div>
             <div class="col-md-5" >
-                <h3> Expression [[ transcript_data.transcript_id ]]</h3>
+                <h3> Expression {{ transcript_data.transcript_id }}</h3>
 
                 <bar-chart id="expression" data="expression.expression" transcript_id = 'transcript_id'></bar-chart>
             </div>
             <div class="col-md-5">
                 <div id="transcript_info"  >
-                    <h3> Transcript name [[ transcript_data.transcript_id ]]</h3>
-                     <p>track: [[ transcript_data.track ]]</p>
+                    <h3> Transcript name {{ transcript_data.transcript_id }}</h3>
+                     <p>track: {{ transcript_data.track }}</p>
                     <table class="table table-striped">
                         <tr>
                         <th>Chr</th>
@@ -101,11 +226,11 @@
                         <th>Strand</th>
                         </tr>
                         <tr ng-repeat="exon in  transcript_data.exons |  orderBy: 'exon_number'">
-                            <td>[[ exon.chr ]]</td>
-                            <td>[[ exon.start ]]</td>
-                            <td>[[ exon.end ]]</td>
-                            <td>[[ exon.exon_number ]]</td>
-                            <td>[[ exon.strand ]]</td>
+                            <td>{{ exon.chr }}</td>
+                            <td>{{ exon.start }}</td>
+                            <td>{{ exon.end }}</td>
+                            <td>{{ exon.exon_number }}</td>
+                            <td>{{ exon.strand }}</td>
                         </tr>
                     </table>
 
@@ -115,5 +240,6 @@
             </div>
         <div class="col-md-1"></div>
     </div>
+{%endverbatim%}
 {% endblock %}
 

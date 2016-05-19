@@ -12,7 +12,10 @@ module.exports = function(grunt) {
                 separator: ';\n',
             },
             libraries : {
-                    src: ['public/lib/jquery/dist/jquery.min.js',
+                    src: [//'public/lib/jquery/dist/jquery.min.js',
+                      'public/lib/jquery-ui-custom/external/jquery/jquery.js',
+                      'public/lib/jquery-ui-custom/jquery-ui.js',
+                      'public/lib/lokijs/src/lokijs.js',
                     'public/lib/boostrap/dist/js/boostrap.min.js',
                     'public/lib/angular/angular.js',
                     'public/lib/angular-loader/angular-loader.js',
@@ -20,8 +23,11 @@ module.exports = function(grunt) {
                     'public/lib/angular-mocks/angular-mocks.js',
                     'public/lib/lodash/dist/lodash.js',
                     'public/lib/d3/d3.min.js',
-                    'public/lib/angular-cookies/angular-cookies.min.js'
-
+                    'public/lib/angular-cookies/angular-cookies.min.js',
+                    'public/lib/angular-multiselect-npm/dist/prod/angular-multi-select.js',
+                    'public/lib/angular-animate/angular-animate.min.js',
+                    'node_modules/angular-ui-bootstrap/dist/ui-bootstrap.js',
+                    'node_modules/angular-ui-bootstrap/dist/ui-bootstrap-tpls.js',
                      ],
                 dest: 'captureseq/static/js/dependencies.js'
 
@@ -42,15 +48,19 @@ module.exports = function(grunt) {
             target : {
                 files: {
                     'captureseq/static/css/built.css': [
+
                         'public/lib/html5-boilerplate/dist/css/main.css',
                         'public/lib/html5-boilerplate/dist/css/normalize.css',
                         'public/lib/html5-boilerplate/dist/css/normalize.css',
                         'public/lib/bootstrap/dist/css/bootstrap.min.css',
+                        'public/lib/jquery-ui-custom/jquery-ui.css',
+                        'public/lib/angular-bootstrap/ui-bootstrap-csp.css',
                         'public/lib/dalliance/*.css',
+                        'public/lib/angular-multiselect-npm/dist/prod/angular-multi-select.min.css',
+
                         'captureseq/capseq/static/css/app.css']
                 }
             }
-
         },
         watch: {
             scripts:{
@@ -64,9 +74,27 @@ module.exports = function(grunt) {
         copy: {
             main : {
                 files: [
-                    {expand: true, cwd: 'public/lib/', src: ['components-font-awesome/**'], dest: 'captureseq/static/'}
+                    {expand: true, cwd: 'public/lib/', src: ['components-font-awesome/**',
+                    ], dest: 'captureseq/static/'}
                 ]
-            }
+            },
+            jqueryui :{
+              files : [
+                {expand : true, cwd : 'public/lib/jquery-ui-custom/', src:['images/**'],
+                  dest:'captureseq/static/css/'}
+              ]
+            },
+          multiselect :{
+              files : [
+                {expand : true, cwd : 'public/lib/multi-select/img', src:['switch.png'],
+                  dest:'captureseq/static/img/'}
+              ]
+            },
+          templates : {
+              files : [
+                {expand: true, cwd : 'node_modules/angular-ui-bootstrap/template/' , src : [ '**'], dest : 'captureseq/static/js/uib/template/'}
+              ]
+          }
         }
         });
 

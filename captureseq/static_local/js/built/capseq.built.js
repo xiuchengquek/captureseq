@@ -4,602 +4,769 @@
 'use strict';
 
 // Declare app level module which depends on views, and components
+
+
+
 angular.module('capseq', [
     'ngRoute',
-    'ngCookies'
-]).
-    config(['$interpolateProvider', function($interpolateProvider) {
-      $interpolateProvider.startSymbol('[[');
-      $interpolateProvider.endSymbol(']]')
-    }]);
+    'ngCookies',
+    "angular-multi-select",
+    "ngAnimate",
+    "ui.bootstrap"])
 ;
 /**
  * Created by xiuchengquek on 25/02/2016.
  */
 
-angular.module('capseq')
-    .controller('GenomeController', ['$scope', '$rootScope', '$http' ,"$q", "$cookies", function ($scope, $rootScope, $http, $q) {
-        $scope.selectedregion = {chr : 1, start : 150534367, end : 150960349,
-            'Region Width' : 425983,  track : 'melanoma',
-         details: {
-            snps: [
-                {
-                    snp_id: "rs7412746"}
-            ],
-            disease: [
-                "melanoma"
-            ]
-        }
-        }
-
-        var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/';
-        'use strict';
-
-        function gencodeFIP(feature, info) {
-            var isGene = false;
-            for (var hi = 0; hi < info.hit.length; ++hi) {
-                if (info.hit[hi].isSuperGroup) {
-                    isGene = true;
-                }
-            }
-            if (!isGene) {
-                info.setTitle('Transcript: ' + feature.label);
-                info.add('Transcript ID', feature.label);
-                info.add('Transcript biotype', feature.method);
-            } else {
-                info.setTitle('Gene: ' + feature.geneId);
-            }
-            info.add('Gene ID', feature.geneId);
-            info.add('Gene name', feature.geneName);
-            info.add('Gene biotype', feature.geneBioType);
-            if (!isGene) {
-                info.add('Transcript attributes', feature.tags);
-            }
-        }
-
-        function getTranscript(transcript_id){
-            var url = '/txinfo/' + transcript_id
-            return $http.get(url)
-        }
-
-        function getExpression(transcript_id, track){
-            var url = track  + '/' +  transcript_id;
-            return $http.get(url)
-        }
-
-
-        function widthData(data){
-            var expression = [];
-            angular.forEach(data, function(value, key){
-                this.push({label : key, value : value})
-            }, expression);
-            return expression
-        }
-
-
-
-
-        function dataParser(feature, info, track) {
-            var transcript_id = feature.label;
-            var txinfo = getTranscript(transcript_id);
-            var expression = getExpression(transcript_id, track);
-
-            $q.all({ txinfo : txinfo, expression : expression })
-                .then(function(results){
-                     var expressionData = results.expression.data.expression;
-                     $scope.transcript_data = results.txinfo.data;
-                     $scope.transcript_data.track = track;
-                     $scope.$broadcast('expression_change', widthData(expressionData));
-            })
-        }
-
-        function getTranscript(transcript_id){
-            var url = '/txinfo/' + transcript_id;
-            return $http.get(url)
-        }
-
-        function getExpression(transcript_id, track){
-            var url = track  + '/' +  transcript_id;
-            return $http.get(url)
-        }
-
-        function getRegionList(){
-            var url = '/capturedregions/';
-            return $http.get(url)
-        }
-
-
-        var browser = new Browser({
-            chr: '1',
-            viewStart: 150727097,
-            viewEnd: 150875437,
-            noPersist : true,
-
-            coordSystem: {
-                speciesName: 'Human',
-                taxon: 9606,
-                auth: 'NCBI',
-                version: '36',
-                ucscName: 'hg19'
-            },
-            browserLinks: {
-                Ensembl: 'http://www.ensembl.org/Homo_sapiens/Location/View?r=${chr}:${start}-${end}',
-                UCSC: 'http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&position=chr${chr}:${start}-${end}',
-                Sequence: 'http://www.derkholm.net:8080/das/hg38comp/sequence?segment=${chr}:${start},${end}'
-            },
-            sources: [{
-                    name: 'Genome',
-                    twoBitURI: file_server + 'hg19.2bit',
-                    tier_type: 'sequence',
-                    pinned: true,
-                    provides_entrypoints: true
-                },
-                {
-                    name: 'GENCODE version 19',
-                    bwgURI: file_server + 'gencode.v19.annotation.bb',
-                    collapseSuperGroups: true,
-                    trixURI: file_server + 'gencode.v19.annotation.ix',
-                    noSourceFeatureInfo: true,
-                    featureInfoPlugin: gencodeFIP
-                },
-                {
-                    name: 'Capture Region - Tissue',
-                    bwgURI: file_server + 'captured_region_tissue.bb'
-              },
-                {
-                    name: 'Capture Region - Melanoma',
-                    bwgURI: file_server + 'captured_region_melanoma.bb'
-                },
-                {
-                    name: 'Capture Transcripts - Tissue',
-                    bwgURI: file_server + 'captured_transcript_tissue_single_noex.bb',
-                    featureInfoPlugin : function(feat, info){
-                        dataParser(feat, info, 'tissue')
-                    }
-                },
-                {
-                    name: 'Capture Transcripts - Melanoma',
-                    bwgURI: file_server + 'captured_transcript_melanoma_single_noex.bb',
-                    featureInfoPlugin : function(feat, info){
-                        dataParser(feat, info, 'melanoma')
-                    }
-
-                }]
-        });
-
-
-        $scope.$on('browserchanged', function(e,d ){
-           browser.setLocation(d.chr.toString(), d.start, d.end);
-        });
-
-
-
-        function load_default(){
-
-            var txinfo = getTranscript('TCONS_00047715');
-            var expressionData =  getExpression('TCONS_00047715', 'melanoma');
-            var regionList = getRegionList();
-
-            $q.all({ txinfo : txinfo, expression : expressionData, regionList :  regionList})
-                .then(function(results){
-                     var expressionData = results.expression.data.expression;
-                     $scope.transcript_data = results.txinfo.data;
-                     $scope.transcript_data.track = 'melanoma';
-                     $scope.region = results.regionList.data;
-                     $scope.$broadcast('expression_change', widthData(expressionData));
-                     $scope.$broadcast('region_change', results.regionList.data);
-
-            })
-
-
-        }
-
-
-        load_default()
-
-
-    }]);
-;
 /**
- * Created by xiuchengquek on 25/02/2016.
- */
+* TODO : break up controlllers
+ *TODO : Change $scope variable to local variable
+*/
+  'use strict';
+
 
 angular.module('capseq')
+  .controller('GenomeController', ['$scope', '$rootScope', '$http', "$q", "$uibModal", "dataLoader", function ($scope, $rootScope, $http, $q ,$uibModal, dataLoader) {
 
-    .directive('barChart', function () {
-        return {
+    /** Selected Region shows the which selection was made on the directive **/
+  // Input data is the input data for the diseasss and their child terms. they contain a attrinbute called id which is an array of
+    // loci_id
+  $scope.input_data = [];
+  // Output data re the selected diseases
+  $scope.output_data = [];
 
-            restrict: 'E',
-            scope: {
-                'data': '=data',
-                'transcript_id': '='
+  // array of loci_id to displayed
+  $scope.displayed_region = [];
 
+  // total set of snps this is for the autocomplete.
+  $scope.availableSnps = [];
 
-            },
-            link: function (scope, element, attrs) {
+  //snpid for search by
+  $scope.snpid = {value : ''}
 
-
-                var margin = {top: 20, right: 20, bottom: 30, left: 40},
-                    width = 520 - margin.left - margin.right,
-                    height = 300 - margin.top - margin.bottom;
-
-                function plotBar(data) {
-
-                    d3.select(".expression_plot").remove();
-
-                    var x = d3.scale.ordinal()
-                        .rangeRoundBands([0, width], .1);
-
-                    var y = d3.scale.linear()
-                        .range([height, 0]);
-
-                    x.domain(data.map(function (d) {
-                        return d.label;
-                    }));
-                    y.domain([0, d3.max(data, function (d) {
-                        return Number(d.value)
-                    }) * 1.1]);
+  // find the number of region to tx
+  $scope.regionToTx = {};
+  // snp and region
+  $scope.regionToDisease = [];
+  $scope.region = [];
 
 
-                    var xAxis = d3.svg.axis()
-                        .scale(x)
-                        .orient("bottom");
+  var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/';
 
-                    var yAxis = d3.svg.axis().scale(y)
-                        .orient("left");
 
-                    var svg = d3.select("#expression").append("svg")
-                        .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
-                        .attr("class", "expression_plot")
-                        .append("g")
-                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-                    svg.append("g")
-                        .attr("class", "x axis")
-                        .attr("transform", "translate(0," + height + ")")
-                        .call(xAxis)
-                        .selectAll("text")
-                        .attr("y", 0)
-                        .attr("x", 9)
-                        .attr("dy", ".35em")
-                        .attr("transform", "rotate(90)")
-                        .style("text-anchor", "start");
-                    ;
 
-                    svg.append("g")
-                        .attr("class", "y axis")
-                        .call(yAxis)
-                        .append("text")
-                        .attr("transform", "rotate(-90)")
-                        .attr("y", 6)
-                        .attr("dy", ".71em")
-                        .style("text-anchor", "end")
-                        .text("Expression (FPKM)");
+  /** Load information for genome Browser **/
 
-                    svg.selectAll(".bar")
-                        .data(data)
-                        .enter().append("rect")
-                        .attr("class", "bar")
-                        .attr("x", function (d) {
-                            return x(d.label);
-                        })
-                        .attr("width", x.rangeBand())
-                        .attr("y", function (d) {
-                            return y(Number(d.value));
-                        })
-                        .attr("height", function (d) {
-                            return height - y(Number(d.value));
-                        });
-                }
+  function gencodeFIP(feature, info) {
+    var isGene = false;
+    for (var hi = 0; hi < info.hit.length; ++hi) {
+      if (info.hit[hi].isSuperGroup) {
+        isGene = true;
+      }
+    }
+    if (!isGene) {
+      info.setTitle('Transcript: ' + feature.label);
+      info.add('Transcript ID', feature.label);
+      info.add('Transcript biotype', feature.method);
+    } else {
+      info.setTitle('Gene: ' + feature.geneId);
+    }
+    info.add('Gene ID', feature.geneId);
+    info.add('Gene name', feature.geneName);
+    info.add('Gene biotype', feature.geneBioType);
+    if (!isGene) {
+      info.add('Transcript attributes', feature.tags);
+    }
+  }
 
-                scope.$on('expression_change', function (event, value) {
-                    plotBar(value)
-                });
+  var browser = new Browser({
+    chr: '1',
+    viewStart: 150727097,
+    viewEnd: 150875437,
+    noPersist: true,
+
+    coordSystem: {
+      speciesName: 'Human',
+      taxon: 9606,
+      auth: 'NCBI',
+      version: '36',
+      ucscName: 'hg19'
+    },
+    browserLinks: {
+      Ensembl: 'http://www.ensembl.org/Homo_sapiens/Location/View?r=${chr}:${start}-${end}',
+      UCSC: 'http://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&position=chr${chr}:${start}-${end}',
+      Sequence: 'http://www.derkholm.net:8080/das/hg38comp/sequence?segment=${chr}:${start},${end}'
+    },
+    sources: [{
+      name: 'Genome',
+      twoBitURI: file_server + 'hg19.2bit',
+      tier_type: 'sequence',
+      pinned: true,
+      provides_entrypoints: true
+    },
+      {
+        name: 'GENCODE version 19',
+        bwgURI: file_server + 'gencode.v19.annotation.bb',
+        collapseSuperGroups: true,
+        trixURI: file_server + 'gencode.v19.annotation.ix',
+        noSourceFeatureInfo: true,
+        featureInfoPlugin: gencodeFIP
+      },
+      {
+        name: 'Capture Region - Tissue',
+        bwgURI: file_server + 'captured_region_tissue.bb'
+      },
+      {
+        name: 'Capture Region - Melanoma',
+        bwgURI: file_server + 'captured_region_melanoma.bb'
+      },
+      {
+        name: 'Capture Transcripts - Tissue',
+        bwgURI: file_server + 'captured_transcript_tissue_single_noex.bb',
+        featureInfoPlugin: function (feat, info) {
+          dataLoader.getTranscriptChangeInfo(feat.label, info, 'tissue').then(
+            function (results) {
+              $scope.transcript_data = results.transcriptData;
+              $scope.$broadcast('expression_change', results.expressionData);
             }
+          );
         }
+      },
+      {
+        name: 'Capture Transcripts - Melanoma',
+        bwgURI: file_server + 'captured_transcript_melanoma_single_noex.bb',
+        featureInfoPlugin: function (feat, info) {
+          dataLoader.getTranscriptChangeInfo(feat.label, info, 'melanoma').then(
+            function (results) {
+              $scope.transcript_data = results.transcriptData;
+              $scope.$broadcast('expression_change', results.expressionData);
+            }
+          );
+        }
+
+      }]
+  });
+
+  $scope.$on('browserchanged', function (e, d) {
+    $scope.selectedregion = d;
+    browser.setLocation(d.chr.toString(), d.start, d.end);
+    //$scope.openRegionModal(d)
+  });
+
+  // load defualt settings
+  dataLoader.loadDefault().then(function (results) {
+
+    var availableSnps = [];
+    var expressionData = results.expression.data.expression;
+    $scope.transcript_data = results.txinfo.data;
+    $scope.transcript_data.track = 'melanoma';
+    $scope.region = results.regionList.data;
+    $scope.$broadcast('expression_change', expressionData);
+    $scope.$broadcast('region_change', results.regionList.data);
+    $scope.selectedregion = {
+      chr: 1, start: 150534367, end: 150960349,
+      'Region Width': 425983, track: 'melanoma',
+      details: { snps: [{ snp_id: "rs7412746" }], disease: [ "melanoma" ]}
+    };
+    angular.forEach($scope.region, function(val, idx ){
+      availableSnps = availableSnps.concat(val.details)
     });
 
+    $scope.availableSnps = _.uniq(availableSnps);
+  });
+
+  dataLoader.getDiseases().then(function(results){
+     var input_data = [];
+     var diseaseMap = dataLoader.getDiseaseMap();
+        angular.forEach(results, function(value, key){
+      var children = [];
+      angular.forEach(value, function(v, i){
+        this.push({ text : v, value : diseaseMap[v], id : v, checked  :  true })
+      }, children);
+      input_data.push({ text : key, value : key + "_parent", id :  key,
+        children : children, isParent : true  })
+    });
+    $scope.input_data = input_data;
+  });
+
+  dataLoader.getSnpsByLoci().then(function(results){
+    $scope.regionToDisease = results;
+
+  })
+
+  $scope.$on('ams_output_model_change', function(event, args){
+    var current_diseases = [];
+    angular.forEach($scope.output_data, function(value, idx){
+      current_diseases = current_diseases.concat(value.value)
+    })
+    current_diseases = _.uniq(current_diseases);
+    var displayed_region = $scope.regionToDisease.filter(function(val, idx ,arr){
+        return (current_diseases.indexOf(val.disease_id) !== -1)
+    })
+    displayed_region= displayed_region.map(function(value, ix){
+        return value.captured_region})
+    $scope.displayed_region = _.uniq(displayed_region)
+  });
+
+
+
+
+
+  $scope.items = ['item1', 'item2', 'item3'];
+
+  $scope.animationsEnabled = true;
+
+  $scope.openRegionModal = function (d) {
+
+    var modalInstance = $uibModal.open({
+      animation: $scope.animationsEnabled,
+      templateUrl: 'myModalContent.html',
+      controller: 'regionModalController',
+      resolve : {
+        regionDetails : function(){
+          return $scope.selectedregion
+        }
+      }
+    });
+
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+    });
+  };
+
+  $scope.toggleAnimation = function () {
+    $scope.animationsEnabled = !$scope.animationsEnabled;
+  };
+
+
+  $scope.snpChanged = function(val){
+    console.log(val)
+
+    var region = $scope.regionToDisease.filter(function(d, i, arr){
+        return d.snp === val
+      })
+
+    var selectedregion = $scope.region.filter(function(d, i, arr){
+        return d.loci_id === region[0].captured_region
+      })
+
+
+    if (!_.isEmpty(selectedregion)){
+         $scope.$emit('browserchanged', selectedregion[0])
+         $scope.$broadcast('goToSnp' , selectedregion[0].loci_id)
+      }
+
+  }
+
+
+
+}]);
+;
+/**
+ * Created by xiuchengquek on 25/02/2016.
+ */
 
 angular.module('capseq')
-    .directive('genomeNavigator', function () {
-
-
-        return {
-            restrict: 'E',
-            scope: {
-
-                'region': '=',
-                'selectedregion': '='
-
-            },
-            link: function (scope, element, attr) {
 
-
-                scope.$on('region_change', function (event, data) {
-
-                    var chromSizes =
-                    {
-                        1: 249250621,
-                        2: 243199373,
-                        3: 198022430,
-                        4: 191154276,
-                        5: 180915260,
-                        6: 171115067,
-                        7: 159138663,
-                        8: 146364022,
-                        9: 141213431,
-                        10: 135534747,
-                        11: 135006516,
-                        12: 133851895,
-                        13: 115169878,
-                        14: 107349540,
-                        15: 102531392,
-                        16: 90354753,
-                        17: 81195210,
-                        18: 78077248,
-                        20: 63025520,
-                        19: 59128983,
-                        22: 51304566,
-                        21: 48129895
-                    };
+  .directive('barChart', function () {
+    return {
+
+      restrict: 'E',
+      scope: {
+        'data': '=data',
+        'transcript_id': '='
+
+
+      },
+      link: function (scope, element, attrs) {
+
+
+        var margin = {top: 20, right: 20, bottom: 30, left: 40},
+          width = 520 - margin.left - margin.right,
+          height = 300 - margin.top - margin.bottom;
+
+        function plotBar(data) {
 
+          d3.select(".expression_plot").remove();
+
+          var x = d3.scale.ordinal()
+            .rangeRoundBands([0, width], .1);
+
+          var y = d3.scale.linear()
+            .range([height, 0]);
+
+          x.domain(data.map(function (d) {
+            return d.label;
+          }));
+          y.domain([0, d3.max(data, function (d) {
+            return Number(d.value)
+          }) * 1.1]);
+
+
+          var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom");
+
+          var yAxis = d3.svg.axis().scale(y)
+            .orient("left");
+
+          var svg = d3.select("#expression").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("class", "expression_plot")
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+          svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+            .selectAll("text")
+            .attr("y", 0)
+            .attr("x", 9)
+            .attr("dy", ".35em")
+            .attr("transform", "rotate(90)")
+            .style("text-anchor", "start");
+
+          svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Expression (FPKM)");
+
+          svg.selectAll(".bar")
+            .data(data)
+            .enter().append("rect")
+            .attr("class", "bar")
+            .attr("x", function (d) {
+              return x(d.label);
+            })
+            .attr("width", x.rangeBand())
+            .attr("y", function (d) {
+              return y(Number(d.value));
+            })
+            .attr("height", function (d) {
+              return height - y(Number(d.value));
+            });
+        }
+
+        scope.$on('expression_change', function (event, value) {
+          plotBar(value)
+        });
+      }
+    }
+  });
+
+
+angular.module('capseq')
+  .directive('genomeNavigator', function () {
+
+
+    return {
+      restrict: 'E',
+      scope: {
 
-                    var margin = {top: 20, right: 20, bottom: 30, left: 40},
-                        width = 800 - margin.left - margin.right,
-                        height = 600 - margin.top - margin.bottom;
+        'region': '=',
+        'selectedregion': '=',
+        'snpToLoci': '<',
+        'displayedRegion': '<'
 
-                    var chr = [];
+      },
+      link: function (scope, element, attr) {
 
-                    d3.map(data, function (d) {
-                        d.chr = parseInt(d.chr)
-                    })
 
-                    var groupedByChr = _.groupBy(data, function (d) {
-                        return d.chr
-                    });
 
-                    angular.forEach(groupedByChr, function (v, k) {
+        scope.$watch('displayedRegion', function (newVal, oldVal) {
+          highlightNodes(newVal);
+        });
 
-                        var max = d3.max(v, function (d) {
-                            return d.end
-                        });
-                        var min = d3.min(v, function (d) {
-                            return d.start
-                        });
 
-                        var chr = k;
-
-                        d3.map(v, function (x) {
-                            x.normalizedStart = x.start - min;
-                            x.normalizedEnd = x.end - min;
-                        });
-
-                        this.push({
-                            'chr': k,
-                            'value': v,
-                            'max': max,
-                            'min': min
-                        })
-
-                    }, chr);
-
-                    var normalizedMax = d3.max(chr, function (d) {
-                        return d3.max(d.value, function (x) {
-                            return x.normalizedEnd
-                        })
-                    });
-
-                    var chromSizeList = [];
-
-                    angular.forEach(chromSizes, function (v, k) {
-                        this.push({
-                            chr: k,
-                            start: 0,
-                            end: v
-                        })
-                    }, chromSizeList);
-
-
-                    var largestChrom = Object.keys(chromSizes).map(function (key) {
-                        return chromSizes[key];
-                    });
-
-
-                    largestChrom = d3.max(largestChrom);
-
-                    var chrArr = d3.max(chr.map(function (d) {
-                        return parseInt(d.chr)
-                    }))
-
-
-                    var x = d3.scale.linear()
-                        .range([0, width]);
-                    var y = d3.scale.linear()
-                        .range([0, height]);
-
-
-                    y.domain([1, chrArr]);
-                    x.domain([0, largestChrom]);
-
-
-                    var zoom = d3.behavior.zoom()
-                        .x(x)
-                        .y(y)
-                        .scaleExtent([0, 10000])
-                        .on("zoom", zoomed);
-
-
-                    var xAxis = d3.svg.axis()
-                        .scale(x)
-                        .orient("bottom")
-                        .tickSize(-height);
-
-                    var colorScale = {
-                        'tissue' : '#17becf',
-                        'melanoma' : ' #d62728'
-                    };
-
-
-                    var yAxis = d3.svg.axis().scale(y)
-                        .orient("left")
-                        .tickValues(chr.map(function (d) {
-                            return parseInt(d.chr)
-                        }))
-                        .tickFormat(d3.format("d"))
-                        .tickSubdivide(0);
-
-
-                    var svg = d3.select("#navigator").append("svg")
-                        .attr("width", width + margin.left + margin.right)
-                        .attr("height", height + margin.top + margin.bottom)
-                        .attr("class", "navigator")
-                        .append("g")
-                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-                        .call(zoom);
-
-                    svg.append("rect")
-                        .attr("width", width)
-                        .attr("height", height)
-                        .style("fill", "none")
-                        .style("pointer-events", "all");
-
-
-                    svg.append("g")
-                        .classed("y axis", true)
-                        .call(yAxis)
-                        .append("text")
-                        .attr("transform", "rotate(-90)")
-                        .attr("y", 6)
-                        .attr("dy", ".71em")
-                        .style("text-anchor", "end")
-                        .text("Chromosome");
-
-                    svg.append("g")
-                        .classed("x axis", true)
-                        .attr("transform", "translate(0," + height + ")")
-                        .call(xAxis)
-                        .append("text")
-                        .classed("label", true)
-                        .attr("x", width)
-                        .attr("y", margin.bottom - 10)
-                        .style("text-anchor", "end");
-
-                    var objects = svg.append("svg")
-
-                    objects.append("svg:line")
-                        .classed("axisLine hAxisLine", true)
-                        .attr("x1", 0)
-                        .attr("y1", 0)
-                        .attr("x2", width)
-                        .attr("y2", 0)
-                        .attr("transform", "translate(0," + height + ")");
-
-                    objects.append("svg:line")
-                        .classed("axisLine vAxisLine", true)
-                        .attr("x1", 0)
-                        .attr("y1", 0)
-                        .attr("x2", 0)
-                        .attr("y2", height);
-
-
-                    objects.selectAll(".box")
-                        .data(chromSizeList)
-                        .enter().append("rect")
-                        .classed("box", true)
-                        .attr("transform", transform)
-                        .attr("height", 10)
-                        .attr("width", function (d) {
-
-
-                            return x(d.end)
-                        }).style('fill', "transparent")
-                        .style('stroke', 'black')
-
-
-                    objects.selectAll(".feature")
-                        .data(data)
-                        .enter().append("rect")
-                        .classed("feature", true)
-                        .classed("selected", function(d){
-                            if (d.track == "melanoma" && d.chr == 1){
-                                return true
-                            }else{
-                                return false
-                            }
-
-
-                        })
-                        .attr("transform", transform)
-                        .attr("height", 10)
-                        .attr("width", function (d) {
-                            return x(d.width)
-                        })
-                        .style('fill', function(d) {
-
-
-
-
-                            return colorScale[d.track]
-                        })
-                        .on('click', function (d) {
-                            d3.selectAll(".selected").classed('selected', false);
-                            d3.select(this).classed('selected', true);
-
-
-                            scope.$apply(function () {
-
-                                scope.selectedregion = d;
-
-                            });
-
-                                scope.$emit('browserchanged', d);
-
-
-
-                            ;
-
-
-                        })
-
-
-                    function zoomed() {
-                        svg.selectAll(".feature").attr("transform", function (d) {
-                            return "translate(" + x(d.start) + "," + y(d.chr) + ")scale(" + d3.event.scale + "," + d3.event.scale + ")"
-                        })
-                        svg.selectAll(".box").attr("transform", function (d) {
-                            return "translate(" + x(d.start) + "," + y(d.chr) + ")scale(" + d3.event.scale + "," + d3.event.scale + ")"
-                        })
-
-
-                        svg.select(".y.axis").call(yAxis);
-                        ;
-                        svg.select(".x.axis").call(xAxis);
-                        ;
-
-
-                    }
-
-                    function transform(d) {
-                        return "translate(" + x(d.start) + "," + y(d.chr) + ")";
-                    }
-
-                });
-
+        function highlightNodes(arr) {
+          d3.selectAll('rect.feature').each(function (d, i) {
+            if (typeof d !== 'undefined') {
+              if (arr.indexOf(d.loci_id) !== -1) {
+                d3.select(this).classed('filtered', false)
+              }
+              else {
+                d3.select(this).classed('filtered', true)
+              }
             }
+          })
         }
 
 
-    })
+
+        scope.$on('region_change', function (event, data) {
+
+          var chromSizes =
+          {
+            1: 249250621,
+            2: 243199373,
+            3: 198022430,
+            4: 191154276,
+            5: 180915260,
+            6: 171115067,
+            7: 159138663,
+            8: 146364022,
+            9: 141213431,
+            10: 135534747,
+            11: 135006516,
+            12: 133851895,
+            13: 115169878,
+            14: 107349540,
+            15: 102531392,
+            16: 90354753,
+            17: 81195210,
+            18: 78077248,
+            20: 63025520,
+            19: 59128983,
+            22: 51304566,
+            21: 48129895
+          };
+
+
+          var margin = {top: 20, right: 20, bottom: 30, left: 40},
+            width = 800 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom,
+            feature_height = 20;
+
+          var current_scale = 0;
+
+
+          var chr = [];
+
+          d3.map(data, function (d) {
+            d.chr = parseInt(d.chr)
+          })
+
+          var groupedByChr = _.groupBy(data, function (d) {
+            return d.chr
+          });
+
+          angular.forEach(groupedByChr, function (v, k) {
+
+            var max = d3.max(v, function (d) {
+              return d.end
+            });
+            var min = d3.min(v, function (d) {
+              return d.start
+            });
+
+            var chr = k;
+
+            d3.map(v, function (x) {
+              x.normalizedStart = x.start - min;
+              x.normalizedEnd = x.end - min;
+            });
+
+            this.push({
+              'chr': k,
+              'value': v,
+              'max': max,
+              'min': min
+            })
+
+          }, chr);
+
+          var normalizedMax = d3.max(chr, function (d) {
+            return d3.max(d.value, function (x) {
+              return x.normalizedEnd
+            })
+          });
+
+          var chromSizeList = [];
+
+          angular.forEach(chromSizes, function (v, k) {
+            this.push({
+              chr: k,
+              start: 0,
+              end: v
+            })
+          }, chromSizeList);
+
+
+          var largestChrom = Object.keys(chromSizes).map(function (key) {
+            return chromSizes[key];
+          });
+
+
+          largestChrom = d3.max(largestChrom);
+
+          var chrArr = d3.max(chr.map(function (d) {
+            return parseInt(d.chr)
+          }))
+
+
+          var x = d3.scale.linear()
+            .range([1, width]);
+          var y = d3.scale.linear()
+            .range([0, height]);
+
+
+          y.domain([1, chrArr]);
+          x.domain([1, largestChrom]);
+
+
+          var zoom = d3.behavior.zoom()
+            .x(x)
+            .y(y)
+            .scaleExtent([0, 10000])
+            .on("zoom", zoomed);
+
+
+          var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickSize(-height);
+
+          var colorScale = {
+            'tissue': '#17becf',
+            'melanoma': ' #d62728'
+          };
+
+
+          var yAxis = d3.svg.axis().scale(y)
+            .orient("left")
+            .tickValues(chr.map(function (d) {
+              return parseInt(d.chr)
+            }))
+            .tickFormat(d3.format("d"))
+            .tickSubdivide(0);
+
+
+          var svg = d3.select("#navigator").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("class", "navigator")
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+            .call(zoom);
+
+          svg.append("rect")
+            .attr("width", width)
+            .attr("height", height)
+            .style("fill", "none")
+            .style("pointer-events", "all");
+
+
+          svg.append("g")
+            .classed("y axis", true)
+            .call(yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .style("text-anchor", "end")
+            .text("Chromosome");
+
+          svg.append("g")
+            .classed("x axis", true)
+            .attr("transform", "translate(0," + (height + margin.top ) + ")")
+            .call(xAxis)
+            .append("text")
+            .classed("label", true)
+            .attr("x", width)
+            .attr("y", margin.bottom)
+            .style("text-anchor", "end");
+
+          var objects = svg.append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .attr('id' , 'main')
+
+          objects.append("svg:line")
+            .classed("axisLine hAxisLine", true)
+            .attr("x1", 0)
+            .attr("y1", 0)
+            .attr("x2", width)
+            .attr("y2", 0)
+            .attr("transform", "translate(0," + height + ")");
+
+          objects.append("svg:line")
+            .classed("axisLine vAxisLine", true)
+            .attr("x1", 0)
+            .attr("y1", 0)
+            .attr("x2", 0)
+            .attr("y2", height);
+
+
+          var main = objects.append('g')
+            .attr('width' , width )
+            .attr("height", height)
+            .attr('id' , 'mainobjects')
+
+
+          main.selectAll(".box")
+            .data(chromSizeList)
+            .enter().append("rect")
+            .classed("box", true)
+            .attr("transform", transform)
+            .attr("height", feature_height)
+            .attr("width", function (d) {
+              return x(d.end)
+            }).style('fill', "transparent")
+            .style('stroke', 'black')
+
+
+          main.selectAll(".feature")
+            .data(data)
+            .enter().append("rect")
+            .classed("feature", true)
+            .classed("selected", function (d) {
+              if (d.track == "melanoma" && d.chr == 1) {
+                return true
+              } else {
+                return false
+              }
+            })
+            .attr("transform", transform)
+            .attr("height", feature_height)
+            .attr("id", function (d) {
+              return d.loci_id
+            })
+            .attr("width", function (d) {
+              return x(d.width)
+            })
+            .style('fill', function (d) {
+              return colorScale[d.track]
+            })
+            .on('click', function (d) {
+
+              clicked(d3.select(this))
+            })
+            .on('mouseover', function(d){
+              d3.select(this).classed('mouseovered' , true)
+            })
+            .on('mouseout', function(d){
+              d3.select(this).classed('mouseovered', false)
+            })
+
+
+          function zoomed() {
+            main.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            svg.select(".y.axis").call(yAxis);
+
+            svg.select(".x.axis").call(xAxis);
+          }
+
+          function transform(d) {
+            return "translate(" + x(d.start) + "," + y(d.chr) + ")";
+          }
+
+          function transformAndScale(that) {
+            var scale = 4
+            var t = d3.transform(that.attr("transform")),
+                  x = t.translate[0],
+                  y = t.translate[1];
+            svg.transition().duration(400)
+                .call(zoom.translate([((x * -scale) + (width / 2)), ((y * -scale) + height / 2)])
+               .scale(scale).event);
+            svg.select(".y.axis").call(yAxis);
+            svg.select(".x.axis").call(xAxis);
+          }
+
+
+
+
+          function clicked(selected){
+            d3.selectAll(".selected").classed('selected', false);
+            selected.classed('selected', true)
+            transformAndScale(selected)
+            scope.$emit('browserchanged', selected.datum());
+
+          }
+          scope.$on('goToSnp',function(event, snpLociId){
+            clicked(d3.select('rect[id="' + snpLociId + '"]'))
+        });
+        });
+      }
+    }
+  });
+/**
+ angular.module('capseq').directive('multiselect', function(){
+    return {
+
+
+
+        link : function(scope, elem, attr){
+
+
+        $(function(){
+           $(".example").multiSelect();
+        });
+
+        }
+
+    }
+
+})
+
+ **/
 
 
 
 
 
+angular.module('capseq').directive('autocomplete', function () {
+  return {
+     restrict: 'A',
+    scope: {
+      'results': '=',
+      'suggestions': '<',
+      'changeEvent' : "&"
+    },
+
+    link: function (scope, elem, attr) {
 
 
+      function checkSearchResults (suggestions, results){
+        if (suggestions.indexOf(results) !== -1){
+
+              return results
+            } else {
+          return false
+        }
+      }
+
+      scope.$watch('suggestions', function (newVal, oldVal) {
+        console.log(newVal);
+        $("#refsearch").autocomplete({
+          source: newVal,
+          focus: function (event, ui) {
+            scope.results.value = checkSearchResults(scope.suggestions, ui.item.value )
+                          scope.changeEvent()
 
 
+          },
+
+          select: function (event, ui) {
+            scope.results.value = checkSearchResults(scope.suggestions, ui.item.value )
+                          scope.changeEvent()
+
+          }
+        })
+
+        $('#refsearch').keypress(function(e){
+          if(e.keyCode == 13){
+            e.preventDefault();
+            $(this).autocomplete('close');
+            console.log(this.value)
+            scope.results.value = checkSearchResults(scope.suggestions, this.value )
+            scope.$parent.$apply()
+                          scope.changeEvent()
+
+
+          }
+        })
+      })
+    }
+  }
+})
 
 
 ;
@@ -637,6 +804,30 @@ angular.module('capseq')
 
   }]);;
 /**
+ * Created by xiuchengquek on 18/05/2016.
+ */
+
+
+
+
+
+
+
+angular.module('capseq').controller('regionModalController', function ($scope, $uibModalInstance, regionDetails) {
+
+
+
+  $scope.regionDetails = regionDetails;
+  $scope.ok = function () {
+    $uibModalInstance.close();
+  };
+
+  $scope.cancel = function () {
+    $uibModalInstance.dismiss('cancel');
+  };
+});
+;
+/**
  * Created by xiuchengquek on 29/02/2016.
  */
 
@@ -649,10 +840,24 @@ angular.module('capseq')
         var default_transcripts_url = '/txinfo/' + default_transcripts;
         var default_expression_url = default_track + default_transcripts;
 
+
     }])
     .factory('dataLoader',  ['$http', '$q', function($http, $q){
 
-        function getTranscript(transcript_id){
+
+      var self = {};
+
+
+      self.diseaseMap = {};
+      self.efoToDiseaseId = {};
+
+
+      function mapEfoToDiseaseId(efo_term){
+        return self.efoToDiseaseId[efo_term]
+      }
+
+
+       function getTranscript(transcript_id){
             var url = '/txinfo/' + transcript_id
             return $http.get(url)
         }
@@ -669,6 +874,89 @@ angular.module('capseq')
                 this.push({label : key, value : value})
             }, expression);
             return expression
+        }
+
+        function getTranscriptChangeInfo (transcript_id, info, track) {
+            var txinfo = getTranscript(transcript_id);
+            var expression = getExpression(transcript_id, track);
+            return $q.all({ txinfo : txinfo, expression : expression })
+              .then(function(results){
+                  var transcriptData = results.txinfo.data;
+                  transcriptData.track = track;
+                  var expressionData = widthData( results.expression.data.expression);
+                  return {
+                      transcriptData  : transcriptData,
+                      expressionData : expressionData
+                  }
+              })
+        }
+        function getRegionList(){
+            var url = '/capturedregions/';
+            return $http.get(url)
+        }
+        function loadDefault() {
+            var txinfo = getTranscript('TCONS_00047715');
+            var expressionData =  getExpression('TCONS_00047715', 'melanoma');
+            var regionList = getRegionList();
+            return $q.all({ txinfo : txinfo, expression : expressionData, regionList :  regionList})
+              .then(function(results){
+                  results.expression.data.expression = widthData( results.expression.data.expression );
+                  return results
+              })
+        }
+
+      function getDiseases() {
+        return $http.get('/traits/all/').then(function(results){
+          var disease = {};
+          self.diseaseMap = results.data;
+          angular.forEach(results.data, function(value, idx){
+            disease[value.parent_term]  = disease[value.parent_term] || [];
+            disease[value.parent_term].push(value.efo_term)
+          });
+
+          angular.forEach(disease, function(value, key){
+            this[key] = _.uniq(value)
+          }, disease);
+
+          angular.forEach(self.diseaseMap, function(value, idx){
+          self.efoToDiseaseId[value.efo_term] = self.efoToDiseaseId[value.efo_term] || [];
+          self.efoToDiseaseId[value.efo_term].push(value.disease_id)
+          });
+
+          angular.forEach(self.diseaseMap, function(value, key){
+            this[key] = _.uniq(value)
+        }, self.diseaseMap);
+          return disease
+        });
+      }
+
+      function getSnpsByLoci(){
+        return $http.get('/snp/').then(function(results){
+          return results.data
+        })
+      }
+
+
+      function getDiseaseMap(){
+        return self.efoToDiseaseId
+      }
+
+
+      function getRegionToTx(){
+        return $http.get('/capturedregions/tx_id').then(function(results){
+          return results.data
+        })
+      }
+
+        return {
+            getTranscriptChangeInfo : getTranscriptChangeInfo,
+            loadDefault : loadDefault,
+            getDiseases : getDiseases,
+            mapEfoToDiseaseId  : mapEfoToDiseaseId,
+            getDiseaseMap : getDiseaseMap,
+            getSnpsByLoci : getSnpsByLoci,
+            getRegionToTx : getRegionToTx
+
         }
     }]);
 

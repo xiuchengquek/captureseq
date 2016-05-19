@@ -63,7 +63,6 @@ angular.module('capseq')
                         .attr("dy", ".35em")
                         .attr("transform", "rotate(90)")
                         .style("text-anchor", "start");
-                    ;
 
                     svg.append("g")
                         .attr("class", "y axis")
@@ -108,10 +107,43 @@ angular.module('capseq')
             scope: {
 
                 'region': '=',
-                'selectedregion': '='
+                'selectedregion': '=',
+                'snpToLoci' : '<',
+                'displayedRegion' : '<'
 
             },
             link: function (scope, element, attr) {
+
+
+
+
+
+                scope.$watch('displayedRegion', function(newVal, oldVal){
+                    highlightNodes(newVal);
+                });
+
+
+                function highlightNodes(arr) {
+
+
+
+
+
+
+                    d3.selectAll('rect.feature').each(function (d, i) {
+
+                        if (typeof d !== 'undefined') {
+
+                            if (arr.indexOf(d.loci_id) !== -1) {
+                                d3.select(this).classed('filtered', false)
+                            }
+                            else {
+                                d3.select(this).classed('filtered' , true)
+                            }
+                        }
+
+                    })
+                }
 
 
                 scope.$on('region_change', function (event, data) {
@@ -145,7 +177,9 @@ angular.module('capseq')
 
                     var margin = {top: 20, right: 20, bottom: 30, left: 40},
                         width = 800 - margin.left - margin.right,
-                        height = 600 - margin.top - margin.bottom;
+                        height = 600 - margin.top - margin.bottom,
+                        feature_height = 20;
+
 
                     var chr = [];
 
@@ -218,7 +252,7 @@ angular.module('capseq')
 
 
                     y.domain([1, chrArr]);
-                    x.domain([0, largestChrom]);
+                    x.domain([-20, largestChrom]);
 
 
                     var zoom = d3.behavior.zoom()
@@ -258,7 +292,7 @@ angular.module('capseq')
 
                     svg.append("rect")
                         .attr("width", width)
-                        .attr("height", height)
+                        .attr("height", height )
                         .style("fill", "none")
                         .style("pointer-events", "all");
 
@@ -269,21 +303,22 @@ angular.module('capseq')
                         .append("text")
                         .attr("transform", "rotate(-90)")
                         .attr("y", 6)
-                        .attr("dy", ".71em")
                         .style("text-anchor", "end")
                         .text("Chromosome");
 
                     svg.append("g")
                         .classed("x axis", true)
-                        .attr("transform", "translate(0," + height + ")")
+                        .attr("transform", "translate(0," + (height + margin.top ) + ")")
                         .call(xAxis)
                         .append("text")
                         .classed("label", true)
                         .attr("x", width)
-                        .attr("y", margin.bottom - 10)
+                        .attr("y", margin.bottom )
                         .style("text-anchor", "end");
 
                     var objects = svg.append("svg")
+                        .attr("width", width)
+                        .attr("height" , height)
 
                     objects.append("svg:line")
                         .classed("axisLine hAxisLine", true)
@@ -298,7 +333,7 @@ angular.module('capseq')
                         .attr("x1", 0)
                         .attr("y1", 0)
                         .attr("x2", 0)
-                        .attr("y2", height);
+                        .attr("y2", height );
 
 
                     objects.selectAll(".box")
@@ -306,10 +341,8 @@ angular.module('capseq')
                         .enter().append("rect")
                         .classed("box", true)
                         .attr("transform", transform)
-                        .attr("height", 10)
+                        .attr("height", feature_height)
                         .attr("width", function (d) {
-
-
                             return x(d.end)
                         }).style('fill', "transparent")
                         .style('stroke', 'black')
@@ -325,40 +358,27 @@ angular.module('capseq')
                             }else{
                                 return false
                             }
-
-
                         })
                         .attr("transform", transform)
-                        .attr("height", 10)
+                        .attr("height", feature_height)
+                        .attr("id", function(d) {
+                            return d.loci_id
+                        })
                         .attr("width", function (d) {
                             return x(d.width)
                         })
                         .style('fill', function(d) {
-
-
-
-
                             return colorScale[d.track]
                         })
                         .on('click', function (d) {
                             d3.selectAll(".selected").classed('selected', false);
                             d3.select(this).classed('selected', true);
-
-
                             scope.$apply(function () {
-
                                 scope.selectedregion = d;
 
                             });
-
                                 scope.$emit('browserchanged', d);
-
-
-
-                            ;
-
-
-                        })
+                        });
 
 
                     function zoomed() {
@@ -388,9 +408,27 @@ angular.module('capseq')
         }
 
 
-    })
+    });
+/**
+angular.module('capseq').directive('multiselect', function(){
+    return {
 
 
+
+        link : function(scope, elem, attr){
+
+
+        $(function(){
+           $(".example").multiSelect();
+        });
+
+        }
+
+    }
+
+})
+
+**/
 
 
 

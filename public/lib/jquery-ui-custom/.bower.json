@@ -1,0 +1,13 @@
+{
+  "name": "jquery-ui-custom",
+  "homepage": "https://github.com/xiuchengquek/jqueryui-custom",
+  "_release": "1f84d7364c",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "1f84d7364cd7e1fa213c47d89ca2caa9f5b51ca5"
+  },
+  "_source": "https://github.com/xiuchengquek/jqueryui-custom.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/xiuchengquek/jqueryui-custom.git"
+}

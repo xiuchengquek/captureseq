@@ -2,6 +2,7 @@
 <html lang="en" ng-app="capseq">
 <head>
     {% load staticfiles %}
+
     <meta charset="UTF-8">
     <title>Capture Seq</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -49,7 +50,25 @@
     }
      li.selected {
          color : #2ca02c;
-     }
+    }
+
+    rect.filtered {
+        fill : grey  !important;;
+
+    }
+
+    .ui-autocomplete {
+        max-height: 200px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+
+
+   .mouseovered {
+       stroke : black;
+       stroke-width : 1px;
+
+   }
 
 
     </style>
@@ -69,4 +88,5 @@
         {% endblock %}
     <script src="{% static 'js/built/capseq.built.js' %}"></script>
 </body>
+
 </html>
