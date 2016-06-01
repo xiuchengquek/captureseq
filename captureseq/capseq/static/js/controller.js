@@ -10,7 +10,7 @@
 
 
 angular.module('capseq')
-  .controller('GenomeController', ['$scope', '$rootScope', '$http', "$q", "$uibModal", "dataLoader", function ($scope, $rootScope, $http, $q ,$uibModal, dataLoader) {
+  .controller('GenomeController', ['$scope', '$rootScope', '$http', "$q", "dataLoader", function ($scope, $rootScope, $http, $q, dataLoader) {
 
     /** Selected Region shows the which selection was made on the directive **/
   // Input data is the input data for the diseasss and their child terms. they contain a attrinbute called id which is an array of
@@ -229,29 +229,6 @@ angular.module('capseq')
         return value.captured_region})
     $scope.displayed_region = _.uniq(displayed_region)
   });
-
-  $scope.openRegionModal = function (d) {
-
-    var modalInstance = $uibModal.open({
-      animation: $scope.animationsEnabled,
-      templateUrl: 'myModalContent.html',
-      controller: 'regionModalController',
-      resolve : {
-        regionDetails : function(){
-          return $scope.selectedregion
-        }
-      }
-    });
-
-    modalInstance.result.then(function (selectedItem) {
-      $scope.selected = selectedItem;
-    }, function () {
-    });
-  };
-
-  $scope.toggleAnimation = function () {
-    $scope.animationsEnabled = !$scope.animationsEnabled;
-  };
 
 
   $scope.snpChanged = function(val){

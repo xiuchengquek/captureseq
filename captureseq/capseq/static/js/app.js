@@ -8,9 +8,5 @@
 
 
 angular.module('capseq', [
-    'ngRoute',
-    'ngCookies',
     "angular-multi-select",
-    "ngAnimate",
-    "ui.bootstrap",
     "smart-table"])

@@ -8,11 +8,7 @@
 
 
 angular.module('capseq', [
-    'ngRoute',
-    'ngCookies',
     "angular-multi-select",
-    "ngAnimate",
-    "ui.bootstrap",
     "smart-table"])
 ;
 /**
@@ -27,7 +23,7 @@ angular.module('capseq', [
 
 
 angular.module('capseq')
-  .controller('GenomeController', ['$scope', '$rootScope', '$http', "$q", "$uibModal", "dataLoader", function ($scope, $rootScope, $http, $q ,$uibModal, dataLoader) {
+  .controller('GenomeController', ['$scope', '$rootScope', '$http', "$q", "dataLoader", function ($scope, $rootScope, $http, $q, dataLoader) {
 
     /** Selected Region shows the which selection was made on the directive **/
   // Input data is the input data for the diseasss and their child terms. they contain a attrinbute called id which is an array of
@@ -246,29 +242,6 @@ angular.module('capseq')
         return value.captured_region})
     $scope.displayed_region = _.uniq(displayed_region)
   });
-
-  $scope.openRegionModal = function (d) {
-
-    var modalInstance = $uibModal.open({
-      animation: $scope.animationsEnabled,
-      templateUrl: 'myModalContent.html',
-      controller: 'regionModalController',
-      resolve : {
-        regionDetails : function(){
-          return $scope.selectedregion
-        }
-      }
-    });
-
-    modalInstance.result.then(function (selectedItem) {
-      $scope.selected = selectedItem;
-    }, function () {
-    });
-  };
-
-  $scope.toggleAnimation = function () {
-    $scope.animationsEnabled = !$scope.animationsEnabled;
-  };
 
 
   $scope.snpChanged = function(val){
@@ -877,10 +850,10 @@ angular.module('capseq').controller('regionModalController', function ($scope, $
 
 
 angular.module('capseq')
-    .service('defaultSettings', ['dataLoader', '$http', '$q', '$cookies', function(dataLoader, $http, $q, $cookies){
+    .service('defaultSettings', ['dataLoader', '$http', '$q', function(dataLoader, $http, $q){
 
-        var default_transcripts = 'TCONS_00047622' || $cookies.get('transcripts');
-        var default_track = '/melanoma/' || $cookies.get('track');
+        var default_transcripts = 'TCONS_00047622';
+        var default_track = '/melanoma/';
         var default_transcripts_url = '/txinfo/' + default_transcripts;
         var default_expression_url = default_track + default_transcripts;
 

@@ -4,10 +4,10 @@
 
 
 angular.module('capseq')
-    .service('defaultSettings', ['dataLoader', '$http', '$q', '$cookies', function(dataLoader, $http, $q, $cookies){
+    .service('defaultSettings', ['dataLoader', '$http', '$q', function(dataLoader, $http, $q){
 
-        var default_transcripts = 'TCONS_00047622' || $cookies.get('transcripts');
-        var default_track = '/melanoma/' || $cookies.get('track');
+        var default_transcripts = 'TCONS_00047622';
+        var default_track = '/melanoma/';
         var default_transcripts_url = '/txinfo/' + default_transcripts;
         var default_expression_url = default_track + default_transcripts;
 

@@ -10,7 +10,7 @@
 
 
 angular.module('capseq')
-  .controller('GenomeController', ['$scope', '$rootScope', '$http', "$q", "$uibModal", "dataLoader", function ($scope, $rootScope, $http, $q ,$uibModal, dataLoader) {
+  .controller('GenomeController', ['$scope', '$rootScope', '$http', "$q", "dataLoader", function ($scope, $rootScope, $http, $q, dataLoader) {
 
     /** Selected Region shows the which selection was made on the directive **/
   // Input data is the input data for the diseasss and their child terms. they contain a attrinbute called id which is an array of
@@ -33,6 +33,8 @@ angular.module('capseq')
   // snp and region
   $scope.regionToDisease = [];
   $scope.region = [];
+  $scope.selectedregion = {};
+  $scope.associatedtable = [];
 
 
   var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/';
@@ -137,9 +139,16 @@ angular.module('capseq')
       }]
   });
 
-  $scope.$on('browserchanged', function (e, data) {
-    browser.setLocation(data.chr.toString(), data.start, data.end);
-    console.log(traitsByDiseaseId, $scope.regionToDisease);
+  $scope.$on('browserchanged', function (e, data, snp) {
+
+    if (angular.isDefined(snp)){
+      browser.setLocation(snp.chr.toString(), snp.start, snp.end);
+    }
+    else {
+      browser.setLocation(data.chr.toString(), data.start, data.end);
+
+    }
+
     var diseaseInSelectedRegion = $scope.regionToDisease.filter(function(d, i, arr){
       return d.captured_region === data.loci_id
     });
@@ -153,7 +162,8 @@ angular.module('capseq')
       return traitsDetails
     });
     data.details = traitDetails;
-    $scope.$apply(function(){$scope.selectedregion = data});
+    $scope.selectedregion = data
+
     //$scope.openRegionModal(d)
   });
 
@@ -220,29 +230,6 @@ angular.module('capseq')
     $scope.displayed_region = _.uniq(displayed_region)
   });
 
-  $scope.openRegionModal = function (d) {
-
-    var modalInstance = $uibModal.open({
-      animation: $scope.animationsEnabled,
-      templateUrl: 'myModalContent.html',
-      controller: 'regionModalController',
-      resolve : {
-        regionDetails : function(){
-          return $scope.selectedregion
-        }
-      }
-    });
-
-    modalInstance.result.then(function (selectedItem) {
-      $scope.selected = selectedItem;
-    }, function () {
-    });
-  };
-
-  $scope.toggleAnimation = function () {
-    $scope.animationsEnabled = !$scope.animationsEnabled;
-  };
-
 
   $scope.snpChanged = function(val){
 
@@ -258,7 +245,7 @@ angular.module('capseq')
     if (!_.isEmpty(selectedregion)){
         var snp_location = $scope.snpSpecificLocation[val];
         $scope.$broadcast('goToSnp' , selectedregion[0].loci_id);
-        $scope.$emit('browserchanged', snp_location);
+        $scope.$emit('browserchanged', selectedregion[0], snp_location);
 
       }
   }
