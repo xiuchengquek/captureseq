@@ -8,15 +8,13 @@
 
 
 
-angular.module('capseq').controller('regionModalController', function ($scope, $uibModalInstance, items) {
+angular.module('capseq').controller('regionModalController', function ($scope, $uibModalInstance, regionDetails) {
 
-  $scope.items = items;
-  $scope.selected = {
-    item: $scope.items[0]
-  };
 
+
+  $scope.regionDetails = regionDetails;
   $scope.ok = function () {
-    $uibModalInstance.close($scope.selected.item);
+    $uibModalInstance.close();
   };
 
   $scope.cancel = function () {

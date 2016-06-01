@@ -44,8 +44,13 @@ class traitsDetails(models.Model):
     parent_term = models.CharField(max_length=200)
     parent_link = models.CharField(max_length=200)
 
-
+# get transcription summary
 class regionToTx(models.Model):
     loci_id  = models.IntegerField()
     transcript_id = models.CharField(max_length=30)
 
+class snpSpecificLocation(models.Model):
+    snp_id = models.CharField(max_length=30)
+    chr = models.CharField(max_length=5)
+    start = models.IntegerField()
+    end = models.IntegerField()

@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
 from rest_framework import serializers
-from models import MelanomaExpression, TissueExpression, TranscriptInfo, CapturedRegion, SnpsByLoci, traitsDetails, regionToTx
+from models import MelanomaExpression, TissueExpression, TranscriptInfo, CapturedRegion, SnpsByLoci, traitsDetails,\
+    regionToTx, snpSpecificLocation
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -203,13 +204,27 @@ class RegionToTxViewSet(viewsets.ViewSet):
     queryset = regionToTx.objects.all()
     serializers_class  = RegionToTxSerializers
 
-    def list(self,requests)  :
+    def list(self,requests):
         queryset = regionToTx.objects.all()
         serializer = RegionToTxSerializers(instance=queryset, many=True)
         return Response(serializer.data)
 
 
 
+class getSnpLocationSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = snpSpecificLocation
+        fields = ('snp_id', 'chr', 'start', 'end')
+
+class getSnpLocation(viewsets.ViewSet):
+    queryset = snpSpecificLocation.objects.all()
+    serializers = getSnpLocationSerializers
+
+
+    def list(self, requests):
+        queryset = snpSpecificLocation.objects.all()
+        serializers = getSnpLocationSerializers(queryset, many =True)
+        return Response(serializers.data)
 
 
 

@@ -21,6 +21,7 @@ angular.module('capseq')
 
       self.diseaseMap = {};
       self.efoToDiseaseId = {};
+      self.traitsByDiseaseId = {};
 
 
       function mapEfoToDiseaseId(efo_term){
@@ -79,19 +80,23 @@ angular.module('capseq')
       function getDiseases() {
         return $http.get('/traits/all/').then(function(results){
           var disease = {};
+          var allTraits = angular.copy(results.data);
+          angular.forEach(allTraits, function(d,i,arr){
+            this[d.disease_id] = d;
+          },self.traitsByDiseaseId)
           self.diseaseMap = results.data;
+
           angular.forEach(results.data, function(value, idx){
             disease[value.parent_term]  = disease[value.parent_term] || [];
             disease[value.parent_term].push(value.efo_term)
           });
-
           angular.forEach(disease, function(value, key){
             this[key] = _.uniq(value)
           }, disease);
 
           angular.forEach(self.diseaseMap, function(value, idx){
-          self.efoToDiseaseId[value.efo_term] = self.efoToDiseaseId[value.efo_term] || [];
-          self.efoToDiseaseId[value.efo_term].push(value.disease_id)
+            self.efoToDiseaseId[value.efo_term] = self.efoToDiseaseId[value.efo_term] || [];
+            self.efoToDiseaseId[value.efo_term].push(value.disease_id)
           });
 
           angular.forEach(self.diseaseMap, function(value, key){
@@ -107,18 +112,51 @@ angular.module('capseq')
         })
       }
 
+      function getSnpSpecificLocation(){
+        return $http.get('/snp_loc/').then(function(results){
+          var data = {};
+          angular.forEach(results.data, function(d, i, arr){
+             this[d.snp_id] = {
+               'chr' : d.chr,
+               'start' : d.start - 9,
+               'end' : d.end + 10
+             }
+          },data);
+          return data
+        })
+      }
 
-      function getDiseaseMap(){
+
+      function getRegionToTx(loci_id){
+        return $http.get('/capturedregions/transcripts/' + loci_id) +'/'.then(function(results){
+          return results.data
+        })
+      }
+
+
+      function getEfoToDiseaseMap(){
         return self.efoToDiseaseId
       }
+
+
+      function getTraitsByDiseaseId(){
+        return self.traitsByDiseaseId
+      }
+
+
+
+
 
         return {
             getTranscriptChangeInfo : getTranscriptChangeInfo,
             loadDefault : loadDefault,
             getDiseases : getDiseases,
             mapEfoToDiseaseId  : mapEfoToDiseaseId,
-            getDiseaseMap : getDiseaseMap,
-            getSnpsByLoci : getSnpsByLoci
+            getEfoToDiseaseMap : getEfoToDiseaseMap,
+            getSnpsByLoci : getSnpsByLoci,
+            getRegionToTx : getRegionToTx,
+            getTraitsByDiseaseId : getTraitsByDiseaseId,
+            getSnpSpecificLocation : getSnpSpecificLocation
         }
     }]);
 

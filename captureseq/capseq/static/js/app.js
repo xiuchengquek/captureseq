@@ -12,4 +12,5 @@ angular.module('capseq', [
     'ngCookies',
     "angular-multi-select",
     "ngAnimate",
-    "ui.bootstrap"])
+    "ui.bootstrap",
+    "smart-table"])

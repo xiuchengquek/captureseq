@@ -102,24 +102,30 @@ angular.module('capseq')
   .directive('genomeNavigator', function () {
 
 
+
+
     return {
       restrict: 'E',
-      scope: {
+      template: '<button id="zoom_in" type="button" class="btn btn-default  btn-xs"  ng-click="svg_zoom_in()">' +
+      '<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>' +
+      '</button>' +
+       '<button id="zoom_out" type="button" class="btn btn-default btn-xs" ng-click="svg_zoom_out()">' +
+      '<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>' +
+      '</button>'+
+       '<button id="refresh" type="button" class="btn btn-default  btn-xs" ng-click="svg_zoom_refresh()">' +
+      '<span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>' +
+      '</button>',
 
+      scope: {
         'region': '=',
         'selectedregion': '=',
         'snpToLoci': '<',
         'displayedRegion': '<'
-
       },
       link: function (scope, element, attr) {
-
-
-
         scope.$watch('displayedRegion', function (newVal, oldVal) {
           highlightNodes(newVal);
         });
-
 
         function highlightNodes(arr) {
           d3.selectAll('rect.feature').each(function (d, i) {
@@ -133,8 +139,6 @@ angular.module('capseq')
             }
           })
         }
-
-
 
         scope.$on('region_change', function (event, data) {
 
@@ -165,14 +169,7 @@ angular.module('capseq')
           };
 
 
-          var margin = {top: 20, right: 20, bottom: 30, left: 40},
-            width = 800 - margin.left - margin.right,
-            height = 600 - margin.top - margin.bottom,
-            feature_height = 20;
-
           var current_scale = 0;
-
-
           var chr = [];
 
           d3.map(data, function (d) {
@@ -184,7 +181,6 @@ angular.module('capseq')
           });
 
           angular.forEach(groupedByChr, function (v, k) {
-
             var max = d3.max(v, function (d) {
               return d.end
             });
@@ -234,235 +230,254 @@ angular.module('capseq')
 
           var chrArr = d3.max(chr.map(function (d) {
             return parseInt(d.chr)
-          }))
-
-
-          var x = d3.scale.linear()
-            .range([1, width]);
-          var y = d3.scale.linear()
-            .range([0, height]);
-
-
-          y.domain([1, chrArr]);
-          x.domain([1, largestChrom]);
-
-
-          var zoom = d3.behavior.zoom()
-            .x(x)
-            .y(y)
-            .scaleExtent([0, 10000])
-            .on("zoom", zoomed);
-
-
-          var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom")
-            .tickSize(-height);
+          }));
 
           var colorScale = {
             'tissue': '#17becf',
             'melanoma': ' #d62728'
           };
 
+          var x = d3.scale.linear();
 
-          var yAxis = d3.svg.axis().scale(y)
-            .orient("left")
-            .tickValues(chr.map(function (d) {
-              return parseInt(d.chr)
-            }))
-            .tickFormat(d3.format("d"))
-            .tickSubdivide(0);
+          var y = d3.scale.linear();
 
+          y.domain([1, chrArr]);
+          x.domain([1, largestChrom]);
 
-          var svg = d3.select("#navigator").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .attr("class", "navigator")
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-            .call(zoom);
+          function render() {
+            var divWidth = $(element).parent().width()
+            var margin = {top: 20, right: 20, bottom: 30, left: 40},
+              width = divWidth - margin.left - margin.right,
+              height = 600 - margin.top - margin.bottom,
+              feature_height = 20;
 
-          svg.append("rect")
-            .attr("width", width)
-            .attr("height", height)
-            .style("fill", "none")
-            .style("pointer-events", "all");
+            x.range([1, width]);
+            y.range([0, height]);
 
+            var zoom = d3.behavior.zoom()
+              .x(x)
+              .y(y)
+              .scaleExtent([0, 10000])
+              .on("zoom", zoomed);
 
-          svg.append("g")
-            .classed("y axis", true)
-            .call(yAxis)
-            .append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 6)
-            .style("text-anchor", "end")
-            .text("Chromosome");
+            var xAxis = d3.svg.axis()
+              .scale(x)
+              .orient("bottom")
+              .tickSize(-height);
 
-          svg.append("g")
-            .classed("x axis", true)
-            .attr("transform", "translate(0," + (height + margin.top ) + ")")
-            .call(xAxis)
-            .append("text")
-            .classed("label", true)
-            .attr("x", width)
-            .attr("y", margin.bottom)
-            .style("text-anchor", "end");
-
-          var objects = svg.append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .attr('id' , 'main')
-
-          objects.append("svg:line")
-            .classed("axisLine hAxisLine", true)
-            .attr("x1", 0)
-            .attr("y1", 0)
-            .attr("x2", width)
-            .attr("y2", 0)
-            .attr("transform", "translate(0," + height + ")");
-
-          objects.append("svg:line")
-            .classed("axisLine vAxisLine", true)
-            .attr("x1", 0)
-            .attr("y1", 0)
-            .attr("x2", 0)
-            .attr("y2", height);
+            var yAxis = d3.svg.axis().scale(y)
+              .orient("left")
+              .tickValues(chr.map(function (d) {
+                return parseInt(d.chr)
+              }))
+              .tickFormat(d3.format("d"))
+              .tickSubdivide(0);
 
 
-          var main = objects.append('g')
-            .attr('width' , width )
-            .attr("height", height)
-            .attr('id' , 'mainobjects')
+            var svg = d3.select("#navigator").append("svg")
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
+              .attr("class", "navigator")
+              .append("g")
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+              .call(zoom);
 
+            svg.append("rect")
+              .attr("width", width)
+              .attr("height", height)
+              .style("fill", "none")
+              .style("pointer-events", "all");
 
-          main.selectAll(".box")
-            .data(chromSizeList)
-            .enter().append("rect")
-            .classed("box", true)
-            .attr("transform", transform)
-            .attr("height", feature_height)
-            .attr("width", function (d) {
-              return x(d.end)
-            }).style('fill', "transparent")
-            .style('stroke', 'black')
+            svg.append("g")
+              .classed("y axis", true)
+              .call(yAxis)
+              .append("text")
+              .attr("transform", "rotate(-90)")
+              .attr("y", 6)
+              .style("text-anchor", "end")
+              .text("Chromosome");
 
+            svg.append("g")
+              .classed("x axis", true)
+              .attr("transform", "translate(0," + (height + margin.top ) + ")")
+              .call(xAxis)
+              .append("text")
+              .classed("label", true)
+              .attr("x", width)
+              .attr("y", margin.bottom)
+              .style("text-anchor", "end");
 
-          main.selectAll(".feature")
-            .data(data)
-            .enter().append("rect")
-            .classed("feature", true)
-            .classed("selected", function (d) {
-              if (d.track == "melanoma" && d.chr == 1) {
-                return true
-              } else {
-                return false
-              }
-            })
-            .attr("transform", transform)
-            .attr("height", feature_height)
-            .attr("id", function (d) {
-              return d.loci_id
-            })
-            .attr("width", function (d) {
-              return x(d.width)
-            })
-            .style('fill', function (d) {
-              return colorScale[d.track]
-            })
-            .on('click', function (d) {
+            var objects = svg.append("svg")
+              .attr("width", width)
+              .attr("height", height)
+              .attr('id', 'main')
 
-              clicked(d3.select(this))
-            })
-            .on('mouseover', function(d){
-              d3.select(this).classed('mouseovered' , true)
-            })
-            .on('mouseout', function(d){
-              d3.select(this).classed('mouseovered', false)
-            })
+            objects.append("svg:line")
+              .classed("axisLine hAxisLine", true)
+              .attr("x1", 0)
+              .attr("y1", 0)
+              .attr("x2", width)
+              .attr("y2", 0)
+              .attr("transform", "translate(0," + height + ")");
 
+            objects.append("svg:line")
+              .classed("axisLine vAxisLine", true)
+              .attr("x1", 0)
+              .attr("y1", 0)
+              .attr("x2", 0)
+              .attr("y2", height);
 
-          function zoomed() {
-            main.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-            svg.select(".y.axis").call(yAxis);
+            var main = objects.append('g')
+              .attr('width', width)
+              .attr("height", height)
+              .attr('id', 'mainobjects')
 
-            svg.select(".x.axis").call(xAxis);
-          }
+            main.selectAll(".box")
+              .data(chromSizeList)
+              .enter().append("rect")
+              .classed("box", true)
+              .attr("transform", transform)
+              .attr("height", feature_height)
+              .attr("width", function (d) {
+                return x(d.end)
+              }).style('fill', "transparent")
+              .style('stroke', 'black')
 
-          function transform(d) {
-            return "translate(" + x(d.start) + "," + y(d.chr) + ")";
-          }
+            main.selectAll(".feature")
+              .data(data)
+              .enter().append("rect")
+              .classed("feature", true)
+              .classed("selected", function (d) {
+                if (d.track == "melanoma" && d.chr == 1) {
+                  return true
+                } else {
+                  return false
+                }
+              })
+              .attr("transform", transform)
+              .attr("height", feature_height)
+              .attr("id", function (d) {
+                return d.loci_id
+              })
+              .attr("width", function (d) {
+                return x(d.width)
+              })
+              .style('fill', function (d) {
+                return colorScale[d.track]
+              })
+              .on('click', function (d) {
+                var selected = d3.select(this);
+                clicked(selected);
+                scope.$emit('browserchanged', selected.datum());
 
-          function transformAndScale(that) {
-            var scale = 4
-            var t = d3.transform(that.attr("transform")),
-                  x = t.translate[0],
-                  y = t.translate[1];
-            svg.transition().duration(400)
+              })
+              .on('mouseover', function (d) {
+                d3.select(this).classed('mouseovered', true)
+              })
+              .on('mouseout', function (d) {
+                d3.select(this).classed('mouseovered', false)
+              });
+
+            var default_translation  = angular.copy(d3.transform(d3.select('#mainobjects').attr("transform")).translate);
+            var default_scale  = angular.copy(d3.transform(d3.select('#mainobjects').attr("transform")).scale);
+
+            function zoomed() {
+              main.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+              svg.select(".y.axis").call(yAxis);
+              svg.select(".x.axis").call(xAxis);
+            }
+
+            function transform(d) {
+              return "translate(" + x(d.start) + "," + y(d.chr) + ")";
+            }
+
+            function transformAndScale(that) {
+              var scale = 4
+              var t = d3.transform(that.attr("transform")),
+                x = t.translate[0],
+                y = t.translate[1];
+              console.log(t)
+              svg.transition().duration(400)
                 .call(zoom.translate([((x * -scale) + (width / 2)), ((y * -scale) + height / 2)])
-               .scale(scale).event);
-            svg.select(".y.axis").call(yAxis);
-            svg.select(".x.axis").call(xAxis);
+                  .scale(scale).event);
+              svg.select(".y.axis").call(yAxis);
+              svg.select(".x.axis").call(xAxis);
+            }
+
+            function clicked(selected) {
+              d3.selectAll(".selected").classed('selected', false);
+              selected.classed('selected', true);
+              transformAndScale(selected)
+            }
+
+            scope.svg_zoom_in = function(){
+              var t = d3.transform(d3.select('#mainobjects').attr("transform")),
+                scale = t.scale[0];
+              scale = scale * 1.5;
+              svg.transition().duration(400)
+                .call(zoom.scale(scale).event);
+              svg.select(".y.axis").call(yAxis);
+              svg.select(".x.axis").call(xAxis);
+            };
+
+            scope.svg_zoom_out = function(){
+              var t = d3.transform(d3.select('#mainobjects').attr("transform")),
+                scale = t.scale[0];
+              console.log(scale)
+              scale = scale * 0.5;
+              svg.transition().duration(400)
+                .call(zoom.scale(scale).event);
+              svg.select(".y.axis").call(yAxis);
+              svg.select(".x.axis").call(xAxis);
+            };
+
+            scope.svg_zoom_refresh = function(){
+               svg.transition().duration(400)
+                .call(zoom.translate(default_translation)
+                  .scale(1).event);
+              svg.select(".y.axis").call(yAxis);
+              svg.select(".x.axis").call(xAxis);
+            };
+
+
+            scope.$on('goToSnp', function (event, snpLociId) {
+              clicked(d3.select('rect[id="' + snpLociId + '"]'))
+            });
           }
 
+          window.onresize = function () {
+                scope.$apply();
+            };
 
-
-
-          function clicked(selected){
-            d3.selectAll(".selected").classed('selected', false);
-            selected.classed('selected', true)
-            transformAndScale(selected)
-            scope.$emit('browserchanged', selected.datum());
-
-          }
-          scope.$on('goToSnp',function(event, snpLociId){
-            clicked(d3.select('rect[id="' + snpLociId + '"]'))
-        });
+             scope.$watch(function () {
+                return angular.element(window)[0].innerWidth;
+            }, function () {
+               d3.select('svg.navigator').remove()
+               render();
+            });
         });
       }
     }
   });
-/**
- angular.module('capseq').directive('multiselect', function(){
-    return {
-
-
-
-        link : function(scope, elem, attr){
-
-
-        $(function(){
-           $(".example").multiSelect();
-        });
-
-        }
-
-    }
-
-})
-
- **/
-
-
-
 
 
 angular.module('capseq').directive('autocomplete', function () {
   return {
-     restrict: 'A',
+    restrict: 'A',
     scope: {
       'results': '=',
       'suggestions': '<',
-      'changeEvent' : "&"
+      'changeEvent': "&"
     },
 
     link: function (scope, elem, attr) {
 
 
-      function checkSearchResults (suggestions, results){
-        if (suggestions.indexOf(results) !== -1){
+      function checkSearchResults(suggestions, results) {
+        if (suggestions.indexOf(results) !== -1) {
 
-              return results
-            } else {
+          return results
+        } else {
           return false
         }
       }
@@ -472,27 +487,26 @@ angular.module('capseq').directive('autocomplete', function () {
         $("#refsearch").autocomplete({
           source: newVal,
           focus: function (event, ui) {
-            scope.results.value = checkSearchResults(scope.suggestions, ui.item.value )
-                          scope.changeEvent()
+            scope.results.value = checkSearchResults(scope.suggestions, ui.item.value)
+            scope.changeEvent()
 
 
           },
 
           select: function (event, ui) {
-            scope.results.value = checkSearchResults(scope.suggestions, ui.item.value )
-                          scope.changeEvent()
-
+            scope.results.value = checkSearchResults(scope.suggestions, ui.item.value)
+            scope.changeEvent()
           }
         })
 
-        $('#refsearch').keypress(function(e){
-          if(e.keyCode == 13){
+        $('#refsearch').keypress(function (e) {
+          if (e.keyCode == 13) {
             e.preventDefault();
             $(this).autocomplete('close');
             console.log(this.value)
-            scope.results.value = checkSearchResults(scope.suggestions, this.value )
+            scope.results.value = checkSearchResults(scope.suggestions, this.value)
             scope.$parent.$apply()
-                          scope.changeEvent()
+            scope.changeEvent()
 
 
           }

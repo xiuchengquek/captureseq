@@ -33,9 +33,12 @@ angular.module('capseq')
   // snp and region
   $scope.regionToDisease = [];
   $scope.region = [];
+  $scope.selectedregion = {};
+  $scope.associatedtable = [];
 
 
   var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/';
+  var traitsByDiseaseId = [];
 
 
 
@@ -98,6 +101,10 @@ angular.module('capseq')
         featureInfoPlugin: gencodeFIP
       },
       {
+        name: 'GWAS Snps',
+        bwgURI: file_server + 'gwas_snp.bb'
+      },
+      {
         name: 'Capture Region - Tissue',
         bwgURI: file_server + 'captured_region_tissue.bb'
       },
@@ -132,15 +139,36 @@ angular.module('capseq')
       }]
   });
 
-  $scope.$on('browserchanged', function (e, d) {
-    $scope.selectedregion = d;
-    browser.setLocation(d.chr.toString(), d.start, d.end);
+  $scope.$on('browserchanged', function (e, data, snp) {
+
+    if (angular.isDefined(snp)){
+      browser.setLocation(snp.chr.toString(), snp.start, snp.end);
+    }
+    else {
+      browser.setLocation(data.chr.toString(), data.start, data.end);
+
+    }
+
+    var diseaseInSelectedRegion = $scope.regionToDisease.filter(function(d, i, arr){
+      return d.captured_region === data.loci_id
+    });
+
+    var traitDetails = diseaseInSelectedRegion.map(function(d, arr, i){
+      var traitsDetails = angular.copy(traitsByDiseaseId[d.disease_id]);
+      traitsDetails.snp = d.snp;
+      traitsDetails.pubmed = d.pubmed;
+      traitsDetails.pvalue = d.pvalue;
+      traitsDetails.snplocation = angular.copy($scope.snpSpecificLocation[d.snp]);
+      return traitsDetails
+    });
+    data.details = traitDetails;
+    $scope.selectedregion = data
+
     //$scope.openRegionModal(d)
   });
 
   // load defualt settings
   dataLoader.loadDefault().then(function (results) {
-
     var availableSnps = [];
     var expressionData = results.expression.data.expression;
     $scope.transcript_data = results.txinfo.data;
@@ -151,7 +179,7 @@ angular.module('capseq')
     $scope.selectedregion = {
       chr: 1, start: 150534367, end: 150960349,
       'Region Width': 425983, track: 'melanoma',
-      details: { snps: [{ snp_id: "rs7412746" }], disease: [ "melanoma" ]}
+      details: [ {snp :"rs7412746" ,  disease: "melanoma", pvalue : '-'  }]
     };
     angular.forEach($scope.region, function(val, idx ){
       availableSnps = availableSnps.concat(val.details)
@@ -161,9 +189,9 @@ angular.module('capseq')
   });
 
   dataLoader.getDiseases().then(function(results){
-     var input_data = [];
-     var diseaseMap = dataLoader.getDiseaseMap();
-        angular.forEach(results, function(value, key){
+    var input_data = [];
+    var diseaseMap = dataLoader.getEfoToDiseaseMap();
+    angular.forEach(results, function(value, key){
       var children = [];
       angular.forEach(value, function(v, i){
         this.push({ text : v, value : diseaseMap[v], id : v, checked  :  true })
@@ -172,10 +200,19 @@ angular.module('capseq')
         children : children, isParent : true  })
     });
     $scope.input_data = input_data;
+    traitsByDiseaseId = dataLoader.getTraitsByDiseaseId()
+
   });
 
   dataLoader.getSnpsByLoci().then(function(results){
     $scope.regionToDisease = results;
+  });
+
+  dataLoader.getSnpSpecificLocation().then(function(results){
+
+    $scope.snpSpecificLocation = results;
+
+
 
   })
 
@@ -183,23 +220,15 @@ angular.module('capseq')
     var current_diseases = [];
     angular.forEach($scope.output_data, function(value, idx){
       current_diseases = current_diseases.concat(value.value)
-    })
+    });
     current_diseases = _.uniq(current_diseases);
     var displayed_region = $scope.regionToDisease.filter(function(val, idx ,arr){
         return (current_diseases.indexOf(val.disease_id) !== -1)
-    })
+    });
     displayed_region= displayed_region.map(function(value, ix){
         return value.captured_region})
     $scope.displayed_region = _.uniq(displayed_region)
   });
-
-
-
-
-
-  $scope.items = ['item1', 'item2', 'item3'];
-
-  $scope.animationsEnabled = true;
 
   $scope.openRegionModal = function (d) {
 
@@ -226,22 +255,22 @@ angular.module('capseq')
 
 
   $scope.snpChanged = function(val){
-    console.log(val)
 
     var region = $scope.regionToDisease.filter(function(d, i, arr){
         return d.snp === val
-      })
+      });
 
     var selectedregion = $scope.region.filter(function(d, i, arr){
         return d.loci_id === region[0].captured_region
-      })
+      });
 
 
     if (!_.isEmpty(selectedregion)){
-         $scope.$emit('browserchanged', selectedregion[0])
-         $scope.$broadcast('goToSnp' , selectedregion[0].loci_id)
-      }
+        var snp_location = $scope.snpSpecificLocation[val];
+        $scope.$broadcast('goToSnp' , selectedregion[0].loci_id);
+        $scope.$emit('browserchanged', selectedregion[0], snp_location);
 
+      }
   }
 
 

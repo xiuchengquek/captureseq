@@ -6,80 +6,198 @@
 
 {%verbatim%}
 
-<div class= "row">
-    <div class="col-md-2"></div>
+<div class= "row ">
 
-                 <div class="col-md-2"><label>Filter Regions By Associated Diseases :
-        <div
+    <div class="col-md-1"></div>
+        <form class="form-inline">
+            <div class="col-md-4">   <h3>Overview : <em>Captured Regions (zoom and select) </em> </h3>
+            <ul class="list-inline">
+                <li class="selected">Selected Captured Region </li>
+                <li class="tissue"> Tissue Captured Region </li>
+                <li class="melanoma">Melanoma Captured Region </li>
+            </ul>
+             </div>
 
-            angular-multi-select
-            input-model="input_data"
-            output-model="output_data"
+            <div class="form-group col-md-3">
+                <label for="exampleInputName2">Filter Regions By Associated Diseases :</label>
+                <div
+                        angular-multi-select
+                        input-model="input_data"
+                        output-model="output_data"
 
-            dropdown-label="<[
+                        dropdown-label="<[
                 <# angularMultiSelectConstants.INTERNAL_STATS_TOTAL_LEAFS #> === undefined ? 'No available items' :
                     <# angularMultiSelectConstants.INTERNAL_STATS_CHECKED_LEAFS #> === 0 ? 'No checked items' :
                         <# angularMultiSelectConstants.INTERNAL_STATS_CHECKED_LEAFS #> + ' checked ' + (<# angularMultiSelectConstants.INTERNAL_STATS_CHECKED_LEAFS #> === 1 ? 'item': 'items')
             ]>"
-            node-label="<[ text ]> (checked
+                        node-label="<[ text ]> (checked
                 <# angularMultiSelectConstants.INTERNAL_KEY_CHECKED_CHILDREN #> /
                 <# angularMultiSelectConstants.INTERNAL_KEY_CHILDREN_LEAFS #>)"
-            leaf-label="<[ text ]> (<[ value ]>)"
+                        leaf-label="<[ text ]> (<[ value ]>)"
 
-            search-field="text"
-        >
+                        search-field="text"
+                >
+                </div>
+            </div>
+            <div class="form-group col-md-32">
+                <label> Filter by Ref Snp Id
+                    <input autocomplete id='refsearch' results= 'snpid' type="text" class="form-control" placeholder="snpID"  change-event="snpChanged(snpid.value)" suggestions="availableSnps" />
+                </label>
+                <span ng-if="snpid.value === false"> not found in captured region</span>
+            </div>
 
-
-
-        </div></label>
-                        </div>
-
-        <div class="col-md-2">
-            <label>
-             Filter by Ref Snp Id
-
-
-            <input autocomplete id='refsearch' results= 'snpid' type="text" class="form-control" placeholder="snpID"  change-event="snpChanged(snpid.value)" suggestions="availableSnps" />
-            </label>
-            <span ng-if="snpid.value === false"> not found in captured region</span>
-
-
-
-        </div>
-
-        <div class="col-md-2">
-
-
-
-
-
-        </div>
-
-        <div class="col-md-2">
-
-
-
-
-
-        </div>
-
-
-     <div class="col-md-2"></div>
+        </form>
+    <div class="col-md-1"></div>
 </div>
 
-<div class="row" >
+<div class="genome_nav row" >
     <div class="col-md-1"></div>
-    <div class="col-md-7">
-        <h3> Captured Regions (zoom and select) </h3>
-        <ul class="list-inline">
-            <li class="selected">Selected Captured Region </li>
-            <li class="tissue"> Tissue Captured Region </li>
-            <li class="melanoma">Melanoma Captured Region </li>
-        </ul>
+    <div class="col-md-6">
+
 
         <genome-navigator id="navigator" region="region" selectedregion="selectedregion"  displayed-region = 'displayed_region' ></genome-navigator>
     </div>
 
+
+
+
+
+    <div class="col-md-4 genome_nav_table">
+
+        <h4>Selected Region </h4>
+        <table class="table table-striped  table-condensed">
+            <thead><tr><td>Chr</td><td>Start</td><td>End</td></tr></thead>
+            <tr>
+               <td> {{ selectedregion.chr || "1"}}</td>
+               <td> {{ selectedregion.start || "150534367"}}</td>
+               <td> {{ selectedregion.end || "150960349" }}</td>
+
+            </tr>
+            <thead><tr><td>Region Width</td><td colspan=2>Track</td></thead>
+            <tr>
+                <td> {{ selectedregion.width || "425983" }}</td>
+                <td> {{ selectedregion.track || "melanoma" }}</td>
+                <td> </td>
+
+            </tr>
+
+        </table>
+
+
+
+        <h4>Associated Disease </h4>
+        <table class="table table-striped table-condensed table-hover">
+            <thead><tr><td>disease</td><td>dbsnp id</td><td>pvalue</td><td>pubmed</td></tr><thead>
+            <tbody class="table-hover">
+            <tr ng-repeat="diseases in selectedregion.details">
+                <td>{{ diseases.disease }} </td><td>{{ diseases.snp }} </td><td>{{ diseases.pvalue }} </td><td>{{ diseases.pubmed }} </td>
+            </tr>
+        </tbody>
+
+        </table>
+        <h4>SNP Genomic Location</h4>
+        <table class="table table-hover  table-condensed">
+            <thead><tr><td>chr</td><td>start</td><td>end</td></tr><thead>
+            <tbody class="table-hover">
+
+            <tr ng-repeat="diseases in selectedregion.details" ng-click="snpChanged(diseases.snp)">
+               <td>{{ diseases.snp }}</td> <td>{{ diseases.snplocation.chr }} </td><td>{{ diseases.snplocation.start}} </td><td>{{ diseases.snplocation.end }} </td>
+            </tr>
+        </tbody>
+        </table>
+
+
+
+
+    </div>
+    <div class="col-md-1"></div>
+</div>
+{%endverbatim%}
+
+{% endblock %}
+
+
+{% block genomebrowser %}
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <hr/>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+<div class="row" >
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <h3> Genome Browser</h3>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+
+
+<div class="row" >
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <div id="svgHolder"></div>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+{% endblock %}
+
+
+{% block expression %}
+{%verbatim%}
+
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <hr/>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10">
+        <h3> Transcript Expression</h3>
+    </div>
+    <div class="col-md-1"></div>
+</div>
+
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-5" >
+        <h4> Expression {{ transcript_data.transcript_id }}</h4>
+
+        <bar-chart id="expression" data="expression.expression" transcript_id = 'transcript_id'></bar-chart>
+    </div>
+    <div class="col-md-5">
+        <div id="transcript_info"  >
+            <h4> Transcript name {{ transcript_data.transcript_id }}</h4>
+            <p>track: {{ transcript_data.track }}</p>
+            <table class="table table-striped">
+                <tr>
+                    <th>Chr</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Exon Number</th>
+                    <th>Strand</th>
+                </tr>
+                <tr ng-repeat="exon in  transcript_data.exons |  orderBy: 'exon_number'">
+                    <td>{{ exon.chr }}</td>
+                    <td>{{ exon.start }}</td>
+                    <td>{{ exon.end }}</td>
+                    <td>{{ exon.exon_number }}</td>
+                    <td>{{ exon.strand }}</td>
+                </tr>
+            </table>
+
+
+
+        </div>
+    </div>
+    <div class="col-md-1"></div>
+</div>
 
 
     <div>
@@ -90,37 +208,42 @@
             <div class="modal-body">
                 <h3>Selected Region </h3>
                 <table class="table table-striped">
-                        <tr>
+                    <tr>
                         <td>Chr</td><td> {{ regionDetails.chr || "1"}}</td>
-                        </tr>
-                        <tr>
+                    </tr>
+                    <tr>
                         <td>Start</td><td> {{ regionDetails.start || "150534367"}}</td>
-                        </tr>
-                        <tr>
+                    </tr>
+                    <tr>
                         <td>End</td><td> {{ regionDetails.end || "150960349" }}</td>
 
-                        </tr>
-                        <tr>
+                    </tr>
+                    <tr>
                         <td>Region Width</td><td> {{ regionDetails.width || "425983" }}</td>
-                        </tr>
-                        <tr>
+                    </tr>
+                    <tr>
                         <td>Track </td><td> {{ regionDetails.track || "melanoma" }}</td>
-                        </tr>
-                    </table>
-            <h3>Associated Disease </h3>
-                <table class="table table-striped">
-                    <tr ng-repeat="diseases in regionDetails.details.disease">
-                            <td>{{ diseases }} </td>
                     </tr>
                 </table>
-            <h3>Associated Snps </h3>
-              <table class="table table-striped">
-                    <tr>
-                    <th>RefSnp Id</th>
-                    <th>Pubmed</th>
-                    <th>Association PValue</th>
+                <h3>Associated Disease </h3>
+                <table class="table table-striped">
+                    <tr ng-repeat="diseases in regionDetails.details.disease">
+                        <td>{{ diseases }} </td>
                     </tr>
-                    <tr ng-repeat="snps in selectedregion.details.snps">
+                </table>
+                <h3>Associated Snps </h3>
+                <table class="table table-striped">
+                    <tr>
+                        <th>RefSnp Id</th>
+                        <th>Pubmed</th>
+                        <th>Association PValue</th>
+                    </tr>
+                    <tr ng-repeat-start="snps in selectedregion.details.snps">
+                        <td><a href="https://www.ebi.ac.uk/gwas/search?query={{ snps.snp_id }}" target="_blank"> {{snps.snp_id}} </a> </td>
+                        <td>{{ snps.pubmed || '-'}} </td>
+                        <td>{{ snps.pvalue || '-' }} </td>
+                    </tr>
+                    <tr ng-repeat-end>
                         <td><a href="https://www.ebi.ac.uk/gwas/search?query={{ snps.snp_id }}" target="_blank"> {{snps.snp_id}} </a> </td>
                         <td>{{ snps.pubmed || '-'}} </td>
                         <td>{{ snps.pvalue || '-' }} </td>
@@ -138,108 +261,6 @@
     </div>
 
 
-
-
-     <div class="col-md-3">
-
-                <h3>Selected Region </h3>
-                    <table class="table table-striped">
-                            <tr>
-                            <td>Chr</td><td> {{ selectedregion.chr || "1"}}</td>
-                            </tr>
-                            <tr>
-                            <td>Start</td><td> {{ selectedregion.start || "150534367"}}</td>
-                            </tr>
-                            <tr>
-                            <td>End</td><td> {{ selectedregion.end || "150960349" }}</td>
-
-                            </tr>
-                            <tr>
-                            <td>Region Width</td><td> {{ selectedregion.width || "425983" }}</td>
-                            </tr>
-                            <tr>
-                            <td>Track </td><td> {{ selectedregion.track || "melanoma" }}</td>
-                            </tr>
-                        </table>
-                <h3>Associated Disease </h3>
-                    <table class="table table-striped">
-                        <tr ng-repeat="diseases in selectedregion.details.disease">
-                                <td>{{ diseases }} </td>
-                        </tr>
-                    </table>
-                <h3>Associated Snps </h3>
-                  <table class="table table-striped">
-                        <tr>
-                        <th>RefSnp Id</th>
-                        <th>Pubmed</th>
-                        <th>Association PValue</th>
-                        </tr>
-                        <tr ng-repeat="snps in selectedregion.details.snps">
-                            <td><a href="https://www.ebi.ac.uk/gwas/search?query={{ snps.snp_id }}" target="_blank"> {{snps.snp_id}} </a> </td>
-                            <td>{{ snps.pubmed || '-'}} </td>
-                            <td>{{ snps.pvalue || '-' }} </td>
-                        </tr>
-                    </table>
-
-
-
-
-     </div>
-     <div class="col-md-1"></div>
-</div>
-{%endverbatim%}
-
-{% endblock %}
-
-
-{% block genomebrowser %}
-    <div class="row" >
-        <div class="col-md-1"></div>
-        <div class="col-md-10">
-                <div id="svgHolder"></div>
-        </div>
-        <div class="col-md-1"></div>
-    </div>
-{% endblock %}
-
-
-{% block expression %}
-{%verbatim%}
-
-    <div class="row">
-        <div class="col-md-1"></div>
-            <div class="col-md-5" >
-                <h3> Expression {{ transcript_data.transcript_id }}</h3>
-
-                <bar-chart id="expression" data="expression.expression" transcript_id = 'transcript_id'></bar-chart>
-            </div>
-            <div class="col-md-5">
-                <div id="transcript_info"  >
-                    <h3> Transcript name {{ transcript_data.transcript_id }}</h3>
-                     <p>track: {{ transcript_data.track }}</p>
-                    <table class="table table-striped">
-                        <tr>
-                        <th>Chr</th>
-                        <th>Start</th>
-                        <th>End</th>
-                        <th>Exon Number</th>
-                        <th>Strand</th>
-                        </tr>
-                        <tr ng-repeat="exon in  transcript_data.exons |  orderBy: 'exon_number'">
-                            <td>{{ exon.chr }}</td>
-                            <td>{{ exon.start }}</td>
-                            <td>{{ exon.end }}</td>
-                            <td>{{ exon.exon_number }}</td>
-                            <td>{{ exon.strand }}</td>
-                        </tr>
-                    </table>
-
-
-
-                </div>
-            </div>
-        <div class="col-md-1"></div>
-    </div>
 {%endverbatim%}
 {% endblock %}
 
