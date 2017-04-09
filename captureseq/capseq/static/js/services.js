@@ -39,7 +39,6 @@ angular.module('capseq')
             return $http.get(url)
         }
 
-
         function widthData(data){
             var expression = [];
             angular.forEach(data, function(value, key){

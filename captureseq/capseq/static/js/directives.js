@@ -6,22 +6,83 @@ angular.module('capseq')
 
   .directive('barChart', function () {
     return {
-
       restrict: 'E',
       scope: {
         'data': '=data',
         'transcript_id': '='
-
-
       },
       link: function (scope, element, attrs) {
 
 
-        var margin = {top: 20, right: 20, bottom: 30, left: 40},
+        var x_axis_order = [
+            ''
+        ]
+
+
+        var margin = {top: 20, right: 20, bottom: 120, left: 40},
           width = 520 - margin.left - margin.right,
-          height = 300 - margin.top - margin.bottom;
+          height = 400 - margin.top - margin.bottom;
+
+        var melanoma_relabel = {
+          "adipose" : "adipose",
+          "bladder" : "bladder",
+          "brain" : "brain",
+          "breast" : "breast",
+          "cervix" : "cervix",
+          "colon" : "colon",
+          "esophagus" : "esophagus",
+          "heart" : "heart",
+          "kidney" : "kidney",
+          "liver" : "liver",
+          "lung" : "lung",
+          "ovary" : "ovary",
+          "placenta" : "placenta",
+          "prostate" : "prostate",
+          "skmusc" : "skmusc",
+          "smint" : "smint",
+          "spleen" : "spleen",
+          "testes" : "testes",
+          "thymus" : "thymus",
+          "thyroid" : "thyroid",
+          "trachea" : "trachea",
+          "melanoma.A02" : "melanoma (A02)",
+          "melanoma.A11" : "melanoma (A11)",
+          "melanoma.A15" : "melanoma (A15)",
+          "melanoma.C001" : "melanoma (C001)",
+          "melanoma.C002" : "melanoma (C002)",
+          "melanoma.C011" : "melanoma (C011)",
+          "melanoma.C021" : "melanoma (C021)",
+          "melanoma.C027" : "melanoma (C027)",
+          "melanoma.C037" : "melanoma (C037)",
+          "melanoma.C054" : "melanoma (C054)",
+          "melanoma.C057" : "melanoma (C057)",
+          "melanoma.C058" : "melanoma (C058)",
+          "melanoma.C077" : "melanoma (C077)"
+        };
+
+        var melanoma_order = Object.keys(melanoma_relabel);
 
         function plotBar(data) {
+
+          var data = data;
+
+          // this is a hack melanoma
+          if ( data.length > 30){
+            var reordered_data = []
+            for(var i = 0; i < melanoma_order.length; i++){
+              for(var x =0; x < data.length; x++){
+                var current_item = data[x]
+                if (current_item.label == melanoma_order[i]){
+                  reordered_data.push(current_item)
+                  continue;
+                }
+
+              }
+
+            };
+            data = reordered_data
+          }
+          console.log(data)
 
           d3.select(".expression_plot").remove();
 

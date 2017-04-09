@@ -26,7 +26,7 @@ angular.module('capseq')
   $scope.availableSnps = [];
 
   //snpid for search by
-  $scope.snpid = {value : ''}
+  $scope.snpid = {value : ''};
 
   // find the number of region to tx
   $scope.regionToTx = {};
@@ -37,7 +37,7 @@ angular.module('capseq')
   $scope.associatedtable = [];
 
 
-  var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data/output/';
+  var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data-rebuild/data/output/bb/';
   var traitsByDiseaseId = [];
 
 
@@ -106,15 +106,15 @@ angular.module('capseq')
       },
       {
         name: 'Capture Region - Tissue',
-        bwgURI: file_server + 'captured_region_tissue.bb'
+        bwgURI: file_server + 'capture_region_tissue.bb'
       },
       {
         name: 'Capture Region - Melanoma',
-        bwgURI: file_server + 'captured_region_melanoma.bb'
+        bwgURI: file_server + 'capture_region_melanoma.bb'
       },
       {
         name: 'Capture Transcripts - Tissue',
-        bwgURI: file_server + 'captured_transcript_tissue_single_noex.bb',
+        bwgURI: file_server + 'transcripts_tissue.bb',
         featureInfoPlugin: function (feat, info) {
           dataLoader.getTranscriptChangeInfo(feat.label, info, 'tissue').then(
             function (results) {
@@ -126,7 +126,7 @@ angular.module('capseq')
       },
       {
         name: 'Capture Transcripts - Melanoma',
-        bwgURI: file_server + 'captured_transcript_melanoma_single_noex.bb',
+        bwgURI: file_server + 'transcripts_melanoma.bb',
         featureInfoPlugin: function (feat, info) {
           dataLoader.getTranscriptChangeInfo(feat.label, info, 'melanoma').then(
             function (results) {

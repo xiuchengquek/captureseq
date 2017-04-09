@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic.base import TemplateView
 from rest_framework import serializers
-from models import MelanomaExpression, TissueExpression, TranscriptInfo, CapturedRegion, SnpsByLoci, traitsDetails,\
+from .models import MelanomaExpression, TissueExpression, TranscriptInfo, CapturedRegion, SnpsByLoci, traitsDetails,\
     regionToTx, snpSpecificLocation
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
@@ -23,9 +23,6 @@ class CapturedRegionSerializer(serializers.ModelSerializer):
         fields = ('loci_id', 'chr', 'start','end', 'strand', 'width', 'track', 'details')
     def clean_details(self, obj):
         return obj.details
-
-
-
 
 class CapturedRegionViewSet(viewsets.ModelViewSet):
     queryset = CapturedRegion.objects.all()

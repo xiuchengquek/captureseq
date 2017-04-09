@@ -1,13 +1,8 @@
 from django.conf.urls import url
 
-from views import MelanomaViewSet, MainPageView, TissueViewSet, TranscriptInfoViewSet,get_captured_region_bedfile,\
-    CapturedRegionViewSet, CapturedRegionLinkedTraitsViewSet, traitsDetailsViewSet, SnpsByLociViewSets, RegionToTxViewSet,\
+from .views import MelanomaViewSet, MainPageView, TissueViewSet, TranscriptInfoViewSet,get_captured_region_bedfile,\
+    CapturedRegionViewSet, traitsDetailsViewSet, SnpsByLociViewSets, RegionToTxViewSet,\
     getSnpLocation
-
-
-
-
-
 
 urlpatterns = [
     url(r'^$', MainPageView.as_view()),
