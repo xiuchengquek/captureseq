@@ -37,7 +37,7 @@ angular.module('capseq')
   $scope.associatedtable = [];
 
 
-  var file_server = 'https://pwbc.garvan.org.au/~xiuque/captureseq-data-rebuild/data/output/bb/';
+  var file_server = 'http://pwbc.garvan.org.au/~xiuque/captureseq-data-rebuild/data/output/bb/';
   var traitsByDiseaseId = [];
 
 
@@ -68,9 +68,9 @@ angular.module('capseq')
   }
 
   var browser = new Browser({
-    chr: '1',
-    viewStart: 150727097,
-    viewEnd: 150875437,
+    chr: '8',
+    viewStart: 128073170,
+    viewEnd: 128237422,
     noPersist: true,
 
     coordSystem: {
@@ -163,12 +163,13 @@ angular.module('capseq')
     });
     data.details = traitDetails;
     $scope.selectedregion = data
+    console.log(data, 'here')
 
     //$scope.openRegionModal(d)
   });
 
   // load defualt settings
-  dataLoader.loadDefault().then(function (results) {
+     var  default_input = dataLoader.loadDefault().then(function (results) {
     var availableSnps = [];
     var expressionData = results.expression.data.expression;
     $scope.transcript_data = results.txinfo.data;
@@ -177,8 +178,8 @@ angular.module('capseq')
     $scope.$broadcast('expression_change', expressionData);
     $scope.$broadcast('region_change', results.regionList.data);
     $scope.selectedregion = {
-      chr: 1, start: 150534367, end: 150960349,
-      'Region Width': 425983, track: 'melanoma',
+      chr: 8, start: 128073170, end: 128237422,
+      'Region Width': 164252, track: 'tissue',
       details: [ {snp :"rs7412746" ,  disease: "melanoma", pvalue : '-'  }]
     };
     angular.forEach($scope.region, function(val, idx ){
@@ -188,7 +189,8 @@ angular.module('capseq')
     $scope.availableSnps = _.uniq(availableSnps);
   });
 
-  dataLoader.getDiseases().then(function(results){
+    default_input = default_input.then(function(){
+        dataLoader.getDiseases().then(function(results){
     var input_data = [];
     var diseaseMap = dataLoader.getEfoToDiseaseMap();
     angular.forEach(results, function(value, key){
@@ -202,11 +204,21 @@ angular.module('capseq')
     $scope.input_data = input_data;
     traitsByDiseaseId = dataLoader.getTraitsByDiseaseId()
 
-  });
+  })
 
-  dataLoader.getSnpsByLoci().then(function(results){
-    $scope.regionToDisease = results;
-  });
+     })
+
+      default_input =  default_input.then(function(){
+
+        dataLoader.getSnpsByLoci().then(function(results){
+          $scope.regionToDisease = results;
+
+        });
+
+
+      })
+
+      default_input.then(function(){
 
   dataLoader.getSnpSpecificLocation().then(function(results){
 
@@ -215,6 +227,8 @@ angular.module('capseq')
 
 
   })
+      })
+
 
   $scope.$on('ams_output_model_change', function(event, args){
     var current_diseases = [];
@@ -243,8 +257,10 @@ angular.module('capseq')
 
 
     if (!_.isEmpty(selectedregion)){
+      console.log('this is region', selectedregion)
         var snp_location = $scope.snpSpecificLocation[val];
         $scope.$broadcast('goToSnp' , selectedregion[0].loci_id);
+        console.log(selectedregion[0])
         $scope.$emit('browserchanged', selectedregion[0], snp_location);
 
       }
